@@ -5,6 +5,7 @@ class User(db.Model, UserMixin):
     # required for flask security
     id = db.Column(db.Integer, primary_key = True)
     email = db.Column(db.String, unique = True, nullable = False)
+    username=db.Column(db.String, nullable = False)
     password = db.Column(db.String, nullable = False)
     fs_uniquifier = db.Column(db.String, unique = True, nullable = False)
     active = db.Column(db.Boolean, nullable = False)
