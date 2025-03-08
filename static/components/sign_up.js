@@ -1,58 +1,58 @@
 export default {
-    data() {
+    template: `
+    <div class="row border">
+        <div class="col" style="height: 750px;">
+            <div class="border mx-auto mt-5" style="height: 500px; width: 300px;">
+                <div>
+                    <h2 class="text-center">Sign up Form</h2>
+                    <div class="mb-2">
+                        <label  for="email">Email:</label>  <br>
+                        <input type="text" id="email" v-model="formData.email" placeholder="Enter your Email">
+                    </div>
+                    <div class="mb-2">
+                        <label for="username"> NAME:</label>  <br>
+                        <input type="text" id="username" v-model="formData.username" placeholder="Enter your Name">
+                    </div>
+                    <div class="mb-2">
+                        <label for="qulification"> Qulification:</label>  <br>
+                        <input type="text" id="qulification" v-model="formData.qulification" placeholder="Enter highest Qulification">
+                    </div>
+                    <div class="mb-2">
+                        <label for="pass">password:</label> <br>
+                        <input type="password" id="pass" v-model="formData.password" placeholder="Create password">
+                    </div>
+                    <div>
+                        <button center class="btn btn-primary" @click="addUser">Register</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>`,
+    data: function() {
         return {
-            email: '',
-            username: '',
-            password: '',
-            confirmPassword: '',
-            error: ''
-        };
-    },
-    methods: {
-        async register() {
-            if (this.password !== this.confirmPassword) {
-                this.error = "Passwords do not match";
-                return;
-            }
-            const response = await fetch('/signup', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    email: this.email,
-                    username: this.username,
-                    password: this.password
-                })
-            });
-            if (response.ok) {
-                this.$router.push('/login');
-            } else {
-                this.error = "Failed to sign up";
-            }
+            formData:{
+                email: "",
+                password: "",
+                qulification: "",
+                username: ""
+            } 
         }
     },
-    template: `
-        <div class="container">
-            <h2>Sign Up</h2>
-            <p v-if="error" class="text-danger">{{ error }}</p>
-            <form @submit.prevent="register">
-                <div class="mb-3">
-                    <label>Email</label>
-                    <input type="email" v-model="email" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label>Username</label>
-                    <input type="text" v-model="username" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label>Password</label>
-                    <input type="password" v-model="password" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label>Confirm Password</label>
-                    <input type="password" v-model="confirmPassword" class="form-control" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Sign Up</button>
-            </form>
-        </div>
-    `
-};
+    methods:{
+        addUser: function(){
+            fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                    "Content-Type": 'application/json'
+                },
+                body: JSON.stringify(this.formData) // the content goes to backend as JSON string
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message)
+                this.$router.push('/login')
+            })
+
+        }
+    }
+}

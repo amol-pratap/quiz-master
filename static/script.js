@@ -4,17 +4,19 @@ import navbar from './components/navbar.js'
 import footer from './components/footer.js'
 import sign_up from './components/sign_up.js'
 import login from './components/login.js'
+import admin_dashboard from './components/admin_dashboard.js'
 
 
 
 
 const routes = [
     { path: '/', component: index },
-    { path: '/index', component: home },
+    { path: '/home', component: home },
     { path: '/navbar', component: navbar },
     { path: '/footer', component: footer },
     { path: '/sign_up', component: sign_up },
-    { path: '/login', component: login }
+    { path: '/login', component: login },
+    { path: '/admin_dashboard', component: admin_dashboard },
 ]
 
 const router = new VueRouter({
