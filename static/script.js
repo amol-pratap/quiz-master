@@ -5,6 +5,12 @@ import footer from './components/footer.js'
 import sign_up from './components/sign_up.js'
 import login from './components/login.js'
 import admin_dashboard from './components/admin_dashboard.js'
+import subject from './components/add_subject.js'
+import chapter from './components/add_chapter.js'
+import quiz from './components/quiz.js'
+import add_quiz from './components/add_quiz.js'
+import add_question from './components/add_question.js'
+
 
 
 
@@ -17,6 +23,12 @@ const routes = [
     { path: '/sign_up', component: sign_up },
     { path: '/login', component: login },
     { path: '/admin_dashboard', component: admin_dashboard },
+    { path: '/add_subject', component: subject},
+    { path: '/add_chapter/:subject_id', name:'chapter', component: chapter},
+    { path: '/quiz', component: quiz},
+    { path: '/quiz/:chapter_id', name:'quiz', component: quiz},
+    { path: '/add_quiz/:chapter_id', name:'add_quiz', component: add_quiz},
+    { path: '/add_question/:quiz_id', name:'add_question', component: add_question}
 ]
 
 const router = new VueRouter({

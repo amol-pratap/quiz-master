@@ -12,7 +12,7 @@ export default {
                     </div>
                     <div class="mx-2 mb-3">
                         <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" v-model="formData.password">
+                        <input type="password" class="form-control" id="password" v-model="formData.password" placeholder="Enter Your Password">
                     </div>
                     <div class="mx-2 mb-3 text-center">
                         <button class="btn btn-primary" @click="loginUser">Login</button>

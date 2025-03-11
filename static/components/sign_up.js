@@ -3,23 +3,23 @@ export default {
     <div class="row border">
         <div class="col" style="height: 750px;">
             <div class="border mx-auto mt-5" style="height: 500px; width: 300px;">
-                <div>
+                <div class="ml-3 p-5">
                     <h2 class="text-center">Sign up Form</h2>
                     <div class="mb-2">
                         <label  for="email">Email:</label>  <br>
-                        <input type="text" id="email" v-model="formData.email" placeholder="Enter your Email">
+                        <input type="text" id="email" v-model="formData.email" placeholder="Enter your Email" required>
                     </div>
                     <div class="mb-2">
                         <label for="username"> NAME:</label>  <br>
-                        <input type="text" id="username" v-model="formData.username" placeholder="Enter your Name">
+                        <input type="text" id="username" v-model="formData.username" placeholder="Enter your Name" required>
                     </div>
                     <div class="mb-2">
                         <label for="qulification"> Qulification:</label>  <br>
-                        <input type="text" id="qulification" v-model="formData.qulification" placeholder="Enter highest Qulification">
+                        <input type="text" id="qulification" v-model="formData.qulification" placeholder="Enter highest Qulification"  required>
                     </div>
                     <div class="mb-2">
                         <label for="pass">password:</label> <br>
-                        <input type="password" id="pass" v-model="formData.password" placeholder="Create password">
+                        <input type="password" id="pass" v-model="formData.password" placeholder="Create password" required>
                     </div>
                     <div>
                         <button center class="btn btn-primary" @click="addUser">Register</button>

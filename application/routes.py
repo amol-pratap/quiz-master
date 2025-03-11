@@ -1,5 +1,5 @@
 from .database import db 
-from .models import User, Role
+from .models import *
 from flask import current_app as app, jsonify, request,render_template
 # from flask_security import hash_password, auth_required, roles_required, current_user
 from flask_security import auth_required, roles_required, roles_accepted, current_user, login_user
@@ -13,11 +13,31 @@ from flask_security.utils import verify_password
 def index():
     return render_template('index.html')
 
-@app.route('/admin')
+@app.route('/api/admin')
 @auth_required('token') #Authorizarion
 @roles_required('admin') #RBAC/ Authorization
 def admin_home():
-    return 'Welcome to the admin dashboard'
+    print("WOrking---------------------",)
+    subjects_data = []  # List to store subject details
+    subjects = Subject.query.all()
+    
+    for sub in subjects:
+        subjects_data.append({
+            'id': sub.id,
+            'name': sub.name,
+            'description': sub.description
+        })
+        
+    chapters_data = []  # List to store subject details
+    chapters = Chapter.query.all()  
+    print("WOrking chapters---------------------",chapters)
+    for chap in chapters:
+       chapters_data.append({
+            'id': chap.id,
+            'name': chap.title
+        })
+
+    return jsonify({'chapters': chapters_data, 'subjects': subjects_data, })
 
 
 @app.route('/user')
@@ -146,3 +166,95 @@ def user_dashboard():
         "email": user.email,
         "roles": roles_list(user.roles)
     })
+    
+    
+    
+@app.route('/api/subject', methods=['POST'])
+@auth_required('token')
+@roles_required('admin')
+def create_subject():
+    body = request.get_json()
+    
+    new_subject = Subject(name = body['name'],
+                description = body['description'])
+    db.session.add(new_subject)
+    db.session.commit()
+
+    return jsonify({
+        "message": "Subject created Successfully!"
+    }),201
+    
+
+@app.route('/api/chapter', methods=['POST'])
+@auth_required('token')
+@roles_required('admin')
+def create_chapter():
+    body = request.get_json()
+    
+    new_chapter = Chapter(title = body['name'],
+                subject_id = body['subject_id'])
+    db.session.add(new_chapter)
+    db.session.commit()
+
+    return jsonify({
+        "message": "Chapter created Successfully!"
+    }),201
+    
+    
+@app.route('/api/subjects', methods=['GET'])
+@auth_required('token')
+@roles_required('admin')
+def get_subjects_with_chapters():
+    subjects = Subject.query.all()
+
+    data = []
+    for subject in subjects:
+        chapters = Chapter.query.filter_by(subject_id=subject.id).all()
+
+        data.append({
+            'id': subject.id,
+            'name': subject.name,
+            'description': subject.description,
+            'chapters': [
+                {
+                    'id': chapter.id,
+                    'title': chapter.title,
+                    'quiz_count': Quiz.query.filter_by(chapter_id=chapter.id).count()  # ✅ Quiz count logic
+                } for chapter in chapters
+            ]
+        })
+
+    return jsonify(data), 200
+
+
+
+
+
+# Route to fetch all quizzes for a specific chapter
+@app.route('/api/chapter/<int:chapter_id>/quizzes', methods=['GET'])
+@auth_required('token')
+@roles_required('admin')
+def get_quizzes_for_chapter(chapter_id):
+    chapter = Chapter.query.get(chapter_id)
+    
+    if not chapter:
+        return jsonify({"error": "Chapter not found!"}), 404
+
+    quizzes = Quiz.query.filter_by(chapter_id=chapter_id).all()
+    
+    quiz_data = [
+        {
+            "id": quiz.id,
+            "title": quiz.title,
+            "description": quiz.description,
+            "questions": [
+                {"id": q.id, "text": q.text} for q in quiz.questions
+            ]
+        }
+        for quiz in quizzes
+    ]
+
+    return jsonify({
+        "chapter_title": chapter.title,
+        "quizzes": quiz_data
+    }), 200

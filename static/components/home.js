@@ -5,7 +5,7 @@ export default {
             <h2> Welcome {{username}} </h2>
             <h3> welcome {{userData.username}} </h3>
             <p>{{userData.email}}, {{email}} Welcome to your dashboard! Here you can see available quizzes and your progress.</p>
-            <router-link class="btn btn-success" to="/quizzes">View Quizzes</router-link>
+            <router-link class="btn btn-success" to="/create_quiz">View Quizzes</router-link>
         
             <div class='mb-3'>
 
