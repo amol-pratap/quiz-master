@@ -52,7 +52,7 @@ def user_home():
 })
     
     
-
+#To login user and admin
 @app.route('/api/login', methods=['POST'])
 # @app.route('/login', methods=['POST'])
 def user_login():
@@ -102,36 +102,8 @@ def user_login():
         }), 404 
 
 
-# from flask import jsonify, request
-# from flask_login import login_user
-# from flask_security.utils import verify_password
-# from application.security import user_datastore  # make sure your user_datastore is correctly set up
 
-# @app.route('/api/login', methods=['POST'])
-# def user_login():
-#     body = request.get_json()
-
-#     email = body.get('email')
-#     password = body.get('password')
-
-#     if not email or not password:
-#         return jsonify({"message": "Email and Password are required!"}), 400
-
-#     user = user_datastore.find_user(email=email)
-
-#     if user and verify_password(password, user.password):
-#         login_user(user)
-#         return jsonify({
-#             "id": user.id,
-#             "username": user.username,
-#             "roles": [role.name for role in user.roles],
-#             "message": "Login successful!"
-#         }), 200
-
-#     return jsonify({"message": "Invalid credentials"}), 401
-
-
-
+#To Register New user
 @app.route('/api/register', methods=['POST'])
 def create_user():
     credentials = request.get_json()
@@ -152,7 +124,7 @@ def create_user():
 
 
 
-
+#To go on user dashboard
 @app.route('/api/user')
 @auth_required('token')
 @roles_required('user')
@@ -160,7 +132,6 @@ def create_user():
 # @roles_accepted(['user', 'admin']) #OR
 def user_dashboard():
     user = current_user
-    print("working-----",user)
     return jsonify({
         "username": user.username,
         "email": user.email,
@@ -169,6 +140,7 @@ def user_dashboard():
     
     
     
+#To create new subject
 @app.route('/api/subject', methods=['POST'])
 @auth_required('token')
 @roles_required('admin')
@@ -185,6 +157,7 @@ def create_subject():
     }),201
     
 
+#To Create new chapter
 @app.route('/api/chapter', methods=['POST'])
 @auth_required('token')
 @roles_required('admin')
@@ -200,7 +173,7 @@ def create_chapter():
         "message": "Chapter created Successfully!"
     }),201
     
-    
+#To get all chapters of all subjects
 @app.route('/api/subjects', methods=['GET'])
 @auth_required('token')
 @roles_required('admin')
@@ -229,26 +202,27 @@ def get_subjects_with_chapters():
 
 
 
-
-# Route to fetch all quizzes for a specific chapter
-@app.route('/api/chapter/<int:chapter_id>/quizzes', methods=['GET'])
+# To get all quiz of paricular chapter
+@app.route('/api/quizzes', methods=['GET'])
 @auth_required('token')
 @roles_required('admin')
-def get_quizzes_for_chapter(chapter_id):
+def get_quizzes():
+    chapter_id = request.args.get('chapter_id')
     chapter = Chapter.query.get(chapter_id)
-    
+
     if not chapter:
         return jsonify({"error": "Chapter not found!"}), 404
 
     quizzes = Quiz.query.filter_by(chapter_id=chapter_id).all()
-    
+
     quiz_data = [
         {
             "id": quiz.id,
             "title": quiz.title,
             "description": quiz.description,
             "questions": [
-                {"id": q.id, "text": q.text} for q in quiz.questions
+                {"id": q.id, "text": q.q_text}
+                for q in quiz.questions
             ]
         }
         for quiz in quizzes
@@ -258,3 +232,92 @@ def get_quizzes_for_chapter(chapter_id):
         "chapter_title": chapter.title,
         "quizzes": quiz_data
     }), 200
+
+
+
+
+
+# Route to Add Quiz with Questions
+@app.route('/api/quiz', methods=['POST'])
+@auth_required('token')
+@roles_required('admin')
+def add_quiz():
+    data = request.get_json()
+
+    chapter_id = data.get('chapter_id')
+    subject_id = Chapter.query.filter_by(id = chapter_id).first().subject_id
+    chapter = Chapter.query.get(chapter_id)
+
+    if not chapter:
+        return jsonify({"error": "Chapter not found!"}), 404
+
+    # Create Quiz
+    new_quiz = Quiz(
+        title=data['title'],
+        description=data['description'],
+        chapter_id=chapter_id,
+        subject_id=subject_id
+    )
+
+    db.session.add(new_quiz)
+
+
+    # Add Questions
+    for question_data in data['questions']:
+        new_question = Question(
+            q_text=question_data['text'],
+            quiz_id=new_quiz.id,
+            correct_option_id=question_data['correct_answer']
+            )
+        db.session.add(new_question)
+        db.session.flush()
+         
+        # Add options
+        options = []
+        for opt in question_data["options"]:
+            option = Option(question_id=new_question.id, opt_text=opt)
+            db.session.add(option)
+            options.append(option)
+
+        db.session.flush()  # Get options IDs
+
+        # Set the correct answer
+        new_question.correct_option_id = options[question_data['correct_answer']].id
+        db.session.commit() 
+            
+    return jsonify({"message": "Quiz created successfully!"}), 201
+
+
+
+
+#To add Question to existing quiz
+@app.route('/api/add_question/<int:quiz_id>', methods=['POST'])
+@auth_required('token')
+@roles_required('admin')
+def add_question(quiz_id):
+    quiz = Quiz.query.get(quiz_id)
+    if not quiz:
+        return jsonify({"success": False, "message": "Quiz not found"}), 404
+
+    body = request.get_json()
+    new_question = Question(
+        quiz_id=quiz_id,
+        q_text=body["text"]
+    )
+    db.session.add(new_question)
+    db.session.flush()  # Get the new question ID before committing
+
+    # Add options
+    options = []
+    for opt in body["options"]:
+        option = Option(question_id=new_question.id, opt_text=opt["text"])
+        db.session.add(option)
+        options.append(option)
+
+    db.session.flush()  # Get options IDs
+
+    # Set the correct answer
+    new_question.correct_option_id = options[body["correct_option"]].id
+    db.session.commit()
+
+    return jsonify({"success": True, "message": "Question added successfully"}), 201

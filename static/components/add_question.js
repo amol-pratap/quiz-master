@@ -1,52 +1,78 @@
 export default {
-    template:`
-    <div>
-        <h2> New Chapter </h2>
-        <div class="">
-           
-            <div>  {{message}} </div>
-
-                <div class="mb-3">
-                    <label for="name" class="form-label">Chaptert Name</label>
-                    <input type="text"id="name" v-model="chapter.name" class="form-control" placeholder="Enter Chapter name" required />
-                </div>
-
-               
-
-                <button @click="create_chapter" class="btn btn-primary w-100">Add Chapter ➕ </button>
+    template: `
+    <div class="container mt-4">
+        <h2 class="text-center">Add New Question</h2>
         
+        <div class="card shadow-sm p-4">
+            <div v-if="message" class="alert alert-info text-center">{{ message }}</div>
+
+            <!-- Question Input -->
+            <div class="mb-3">
+                <label for="question_text" class="form-label">Question</label>
+                <textarea id="question_text" v-model="question.text" class="form-control bg-primary text-white bg-gradient p-3" rows="3" placeholder="Enter your question here" required></textarea>
+            </div>
+
+            <!-- Options -->
+            <div class="mb-3">
+                <label class="form-label">Options</label>
+                <div v-for="(option, index) in question.options" :key="index" class="input-group mb-2">
+                    <input type="text" class="form-control bg-info text-white bg-gradient p-3" v-model="option.text" placeholder="Option " required>
+                    <div class="input-group-text bg-secondary text-white bg-gradient p-3">
+                        <input type="radio" name="correct_option" :value="index" v-model="question.correct_option" required>
+                        <label class="ms-2">Correct</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button @click="submitQuestion" class="btn btn-primary w-100">Submit Question</button>
         </div>
-
     </div>`,
-    data: function(){
-        return {
-            chapter: {
-                name: '',
-                subject_id: this.$route.params.subject_id
-                },
-                Message:""
-            }
-        },
 
-        methods:{
-            create_chapter(){
-            fetch('/api/chapter',{
+    data() {
+        return {
+            quiz_id: this.$route.params.quiz_id, // Get quiz_id from URL
+            question: {
+                text: '',
+                options: [
+                    { text: '' },
+                    { text: '' },
+                    { text: '' },
+                    { text: '' }
+                ],
+                correct_option: null // Index of the correct answer
+            },
+            message: ''
+        };
+    },
+
+    methods: {
+       
+
+        submitQuestion() {
+            if (!this.question.text || this.question.correct_option === null) {
+                alert("Please fill all fields and select the correct answer!");
+                return;
+            }
+
+            fetch(`/api/add_question/${this.quiz_id}`, {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json",
                     "Authentication-Token": localStorage.getItem('auth_token')
                 },
-                body: JSON.stringify(this.chapter)
-                })
-                .then(response => response.json())
-                .then(data =>{
-                    console.log("Response Data:",data)
-                    this.chapters = data
-                    this.$router.push('/admin_dashboard')
-                })
-            }
-
-            
+                body: JSON.stringify(this.question)
+            })
+            .then(response => response.json())
+            .then(data => {
+                this.message = data.message;
+                if (data.success) {
+                    setTimeout(() => {
+                        this.$router.go(-1);
+                    }, 500); // Redirect after 2 seconds
+                }
+            })
+            .catch(error => console.error("Error submitting question:", error));
         }
-   
+    }
 }

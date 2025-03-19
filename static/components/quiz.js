@@ -1,7 +1,7 @@
 export default {
     template: `
     <div>
-        <h2 class="text-center my-3">Chapter: {{chapter_tirle}}</h2>
+        <h2 class="text-center my-3">Chapter: {{chapter_title}}</h2>
 
         <div class="row">
             <!-- Quiz List -->
@@ -48,7 +48,7 @@ export default {
                 <div class="card border-primary shadow-sm">
                     <div class="card-body text-center">
                         <h4 class="text-primary">➕ Add New Quiz</h4>
-                        <router-link to="'/add_quiz/' + chapter_id" class="btn btn-outline-primary w-100">
+                        <router-link :to="'/add_quiz/' + chapter_id" class="btn btn-outline-primary w-100">
                             Add Quiz
                         </router-link>
                     </div>
@@ -60,20 +60,22 @@ export default {
     data() {
         return {
             quizzes: [],
-            subject_id: ""
+            chapter_id: this.$route.params.chapter_id, // Get chapter_id from URL
+            chapter_title: "" // To display the chapter title dynamically
         }
     },
 
     methods: {
-        fetchQuizzes() {
-            fetch('/api/quizzes', {
+        fetchQuizzes() {      //To display all quizess and their quetions
+            fetch(`/api/quizzes?chapter_id=${this.chapter_id}`, {
                 headers: {
                     "Authentication-Token": localStorage.getItem('auth_token')
                 }
             })
             .then(response => response.json())
             .then(data => {
-                this.quizzes = data;
+                this.quizzes = data.quizzes;
+                this.chapter_title = data.chapter_title; // Display chapter title
             })
             .catch(error => console.error("Error fetching quizzes:", error));
         },
