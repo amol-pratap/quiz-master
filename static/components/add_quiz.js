@@ -81,7 +81,7 @@ export default {
         submitQuiz() {
             this.chapter_id = this.$route.params.chapter_id;
 
-            fetch(`/api/quiz`, {
+            fetch(`/api/quizzes`, {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json",

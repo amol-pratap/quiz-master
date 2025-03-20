@@ -44,6 +44,7 @@ export default {
             </div>
 
             <!-- Add New Quiz Card -->
+            <div class="row justify-content-center">
             <div class="col-md-4 mb-3 mx-auto text-center">
                 <div class="card border-primary shadow-sm">
                     <div class="card-body text-center">
@@ -53,6 +54,7 @@ export default {
                         </router-link>
                     </div>
                 </div>
+            </div>
             </div>
         </div>
     </div>`,

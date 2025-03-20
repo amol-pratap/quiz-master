@@ -30,15 +30,15 @@ class Subject(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), unique=True, nullable=False)
     description = db.Column(db.Text, nullable=True)
-    chapters = db.relationship('Chapter', backref='subject', lazy=True)
+    chapters = db.relationship('Chapter', backref='subject', cascade="all, delete", lazy=True)
     
 
 #Chapters
 class Chapter(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255), nullable=False)
-    subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False)
-    quizzes = db.relationship('Quiz', backref='chapter', lazy=True)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subject.id', ondelete="CASCADE"), nullable=False)
+    quizzes = db.relationship('Quiz', backref='chapter', cascade="all, delete", lazy=True)
     
 
 #Quize
@@ -46,24 +46,24 @@ class Quiz(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=True)
-    subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False)
-    chapter_id = db.Column(db.Integer, db.ForeignKey('chapter.id'), nullable=False)
-    questions = db.relationship('Question', backref='quiz', lazy=True)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subject.id', ondelete="CASCADE"), nullable=False)
+    chapter_id = db.Column(db.Integer, db.ForeignKey('chapter.id', ondelete="CASCADE"),  nullable=False)
+    questions = db.relationship('Question', backref='quiz', cascade="all, delete", lazy=True)
     
     
 #Question
 class Question(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'), nullable=False)
+    quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id', ondelete="CASCADE"), nullable=False)
     q_text = db.Column(db.Text, nullable=False)
-    options = db.relationship('Option', backref='question', lazy=True,  foreign_keys='Option.question_id')
-    correct_option_id = db.Column(db.Integer, db.ForeignKey('option.id'))
+    options = db.relationship('Option', backref='question', lazy=True, cascade="all, delete",  foreign_keys='Option.question_id')
+    correct_option_id = db.Column(db.Integer, db.ForeignKey('option.id', ondelete="CASCADE"))
  
  
 # option for for correspindg q_id
 class Option(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)
+    question_id = db.Column(db.Integer, db.ForeignKey('question.id', ondelete="CASCADE"), nullable=False)
     opt_text = db.Column(db.String(255), nullable=False)     
     
     

@@ -1,107 +1,77 @@
-// add_quiz.js
+// edit_question.js
 export default {
     template: `
-    <div>
-        <h2 class="text-center my-3">Add New Quiz</h2>
-
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <!-- Quiz Title -->
+        <div class="container">
+            <h2 class="text-center">Edit Question</h2>
+            <form @submit.prevent="updateQuestion">
+                <!-- Question Text -->
                 <div class="mb-3">
-                    <label for="quizTitle" class="form-label">Quiz Title</label>
-                    <input type="text" id="quizTitle" v-model="quiz.title" class="form-control" placeholder="Enter quiz title" required />
+                    <label class="form-label">Question Text</label>
+                    <textarea class="form-control" v-model="question.text" :value="question.text" required></textarea>
                 </div>
 
-                <!-- Quiz Description -->
+                <!-- Options (Fixed 4) with Radio Buttons -->
                 <div class="mb-3">
-                    <label for="quizDescription" class="form-label">Description</label>
-                    <textarea id="quizDescription" v-model="quiz.description" class="form-control" rows="3" placeholder="Enter quiz description"></textarea>
-                </div>
-
-                <!-- Question List -->
-                <h5 class="text-muted mb-2">Questions:</h5>
-                <div v-for="(question, index) in quiz.questions" :key="index" class="border p-3 mb-2">
-                    <label class="form-label">Question {{ index + 1 }}</label>
-                    <input type="text" v-model="question.text" class="form-control mb-2" placeholder="Enter question text" required />
-
-                    <!-- Options -->
-                    <div v-for="(option, optIndex) in question.options" :key="optIndex" class="mb-2">
-                        <input type="text" v-model="question.options[optIndex]" class="form-control" placeholder="Enter option {{ optIndex + 1 }}" required />
+                    <label class="form-label">Options</label>
+                    <div v-for="(option, index) in question.options" :key="index" class="input-group mb-2">
+                        <div class="input-group-text">
+                            <input type="radio" v-model="question.correct_answer" :value="option" required>
+                        </div>
+                        <input type="text" class="form-control" v-model="question.options[index]" required>
                     </div>
-
-                    <label class="form-label mt-2">Correct Answer (1-4)</label>
-                    <input type="number" v-model="question.correct_answer" class="form-control" min="1" max="4" required />
-
-                    <button @click="removeQuestion(index)" class="btn btn-outline-danger btn-sm mt-2">🗑️ Remove Question</button>
                 </div>
-
-                <!-- Add Question Button -->
-                <button @click="addQuestion" class="btn btn-outline-primary btn-sm w-100 mt-3">➕ Add Another Question</button>
 
                 <!-- Submit Button -->
-                <button @click="submitQuiz" class="btn btn-success w-100 mt-3">Submit Quiz</button>
-            </div>
+                <button type="submit" class="btn btn-success">Update Question</button>
+            </form>
         </div>
-    </div>`,
-
+    `,
     data() {
         return {
-            quiz: {
-                title: '',
-                description: '',
-                questions: [
-                    {
-                        text: '',
-                        options: ['', '', '', ''],
-                        correct_answer: 1
-                    }
-                ]
-            },
-            chapter_id: ''
+            question: {
+                text: "",
+                options: ["", "", "", ""], // Exactly 4 options
+                correct_answer: ""
+            }
         };
     },
-
     methods: {
-        addQuestion() {
-            this.quiz.questions.push({
-                text: '',
-                options: ['', '', '', ''],
-                correct_answer: 1
-            });
+        // Fetch question details from API
+        fetchQuestion() {
+            fetch(`/api/question/${this.$route.params.id}`, {
+                headers: { "Authentication-Token": localStorage.getItem("auth_token") }
+            })
+            .then(res => res.json())
+            .then(data => {
+                this.question.text = data.text;
+                this.question.options = data.options.slice(0, 4); // Ensure exactly 4 options
+                this.question.correct_answer = data.correct_answer;
+            })
+            .catch(err => console.error("Error fetching question:", err));
         },
 
-        removeQuestion(index) {
-            this.quiz.questions.splice(index, 1);
-        },
-
-        submitQuiz() {
-            this.chapter_id = this.$route.params.chapter_id;
-
-            fetch(`/api/quiz`, {
-                method: 'POST',
+        // Update question via API
+        updateQuestion() {
+            fetch(`/api/question/${this.$route.params.id}`, {
+                method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authentication-Token": localStorage.getItem('auth_token')
+                    "Authentication-Token": localStorage.getItem("auth_token")
                 },
-                body: JSON.stringify({
-                    ...this.quiz,
-                    chapter_id: this.chapter_id
-                })
+                body: JSON.stringify(this.question)
             })
-            .then(response => response.json())
-            .then(data => {
-                alert("Quiz added successfully!");
-                this.$router.push(`/quiz/${this.chapter_id}`);
+            .then(response => {
+                if (response.ok) {
+                    alert("Question Updated Successfully!");
+                    this.$router.push("/admin_dashboard"); // Redirect back
+                } else {
+                    alert("Failed to update question!");
+                }
             })
-            .catch(error => {
-                console.error("Error adding quiz:", error);
-                alert("Failed to add quiz.");
-            });
+            .catch(err => console.error("Error updating question:", err));
         }
+    },
+    mounted() {
+        this.fetchQuestion();
     }
 }
-
-
-
-
-//Router for add_quiz.js

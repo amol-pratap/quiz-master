@@ -22,14 +22,14 @@ export default {
     },
     methods: {
         fetchSubject() {
-            fetch(`/api/subject/${this.$route.params.id}`, {
+            fetch(`/api/subject/${this.$route.params.subject_id}`, {
                 headers: { "Authentication-Token": localStorage.getItem("auth_token") }
             })
             .then(res => res.json())
             .then(data => this.subject = data);
         },
         updateSubject() {
-            fetch(`/api/subject/${this.$route.params.id}`, {
+            fetch(`/api/subject/${this.$route.params.subject_id}`, {
                 method: "PUT",
                 headers: { 
                     "Content-Type": "application/json",
@@ -37,6 +37,7 @@ export default {
                 },
                 body: JSON.stringify(this.subject)
             }).then(() => alert("Subject Updated Successfully!"));
+            this.$router.go(-1)
         }
     },
     mounted() {

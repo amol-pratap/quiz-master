@@ -18,14 +18,14 @@ export default {
     },
     methods: {
         fetchQuiz() {
-            fetch(`/api/quiz/${this.$route.params.id}`, {
+            fetch(`/api/quiz/${this.$route.params.quiz_id}`, {
                 headers: { "Authentication-Token": localStorage.getItem("auth_token") }
             })
             .then(res => res.json())
             .then(data => this.quiz = data);
         },
         updateQuiz() {
-            fetch(`/api/quiz/${this.$route.params.id}`, {
+            fetch(`/api/quiz/${this.$route.params.quiz_id}`, {
                 method: "PUT",
                 headers: { 
                     "Content-Type": "application/json",
@@ -33,6 +33,7 @@ export default {
                 },
                 body: JSON.stringify(this.quiz)
             }).then(() => alert("Quiz Updated Successfully!"));
+            this.$router.go(-1);
         }
     },
     mounted() {

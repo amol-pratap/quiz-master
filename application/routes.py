@@ -238,12 +238,12 @@ def get_quizzes():
 
 
 # Route to Add Quiz with Questions
-@app.route('/api/quiz', methods=['POST'])
+@app.route('/api/quizzes', methods=['POST'])
 @auth_required('token')
 @roles_required('admin')
 def add_quiz():
     data = request.get_json()
-
+    print("DATA_________________________",data)
     chapter_id = data.get('chapter_id')
     subject_id = Chapter.query.filter_by(id = chapter_id).first().subject_id
     chapter = Chapter.query.get(chapter_id)
@@ -260,8 +260,9 @@ def add_quiz():
     )
 
     db.session.add(new_quiz)
-
-
+    db.session.flush()
+    
+ 
     # Add Questions
     for question_data in data['questions']:
         new_question = Question(

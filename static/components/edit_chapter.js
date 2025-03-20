@@ -18,14 +18,14 @@ export default {
     },
     methods: {
         fetchChapter() {
-            fetch(`/api/chapter/${this.$route.params.id}`, {
+            fetch(`/api/chapter/${this.$route.params.chapter_id}`, {
                 headers: { "Authentication-Token": localStorage.getItem("auth_token") }
             })
             .then(res => res.json())
             .then(data => this.chapter = data);
         },
         updateChapter() {
-            fetch(`/api/chapter/${this.$route.params.id}`, {
+            fetch(`/api/chapter/${this.$route.params.chapter_id}`, {
                 method: "PUT",
                 headers: { 
                     "Content-Type": "application/json",
@@ -33,6 +33,8 @@ export default {
                 },
                 body: JSON.stringify(this.chapter)
             }).then(() => alert("Chapter Updated Successfully!"));
+           
+            this.$router.go(-1);
         }
     },
     mounted() {
