@@ -17,6 +17,6 @@ cd ~/window/MAD-2.P/project/quiz-master
 source .env/bin/activate
 python main.py
 
-..
+kk
 
 
