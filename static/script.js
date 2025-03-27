@@ -20,6 +20,7 @@ import edit_question from './components/edit_question.js'
 import u_search from './components/u_search.js';
 import a_search from './components/a_search.js';
 import u_summary from './components/u_summary.js';
+import a_summary from './components/a_summary.js';
 
 
 
@@ -50,6 +51,7 @@ const routes = [
     { path: '/u_search', component: u_search },
     { path: '/u_summary', component: u_summary },
     { path: '/a_search', component: a_search },
+    { path: '/a_summary', component: a_summary },
 ]
 
 const router = new VueRouter({

@@ -28,19 +28,23 @@ export default {
 
     data() {
         return {
-            question_id: this.$route.params.question_id, // Get question_id from URL
+            question_id: null,  // Initialized as null to avoid undefined issues
             question: {
-                id: "",
+                id: null,
                 text: "",
-                correct_option_id: "",
-                options: [] // Exactly 4 options
+                options: [], // Ensure it's an array to avoid "Cannot read properties of undefined" error
+                correct_option_id: null
             }
         };
     },
 
     methods: {
-        // Fetch question details from API
         fetchQuestion() {
+            if (!this.question_id) {
+                console.error("Question ID is undefined.");
+                return;
+            }
+
             fetch(`/api/question/${this.question_id}`, {
                 method: "GET",
                 headers: { 
@@ -48,16 +52,25 @@ export default {
                     "Authentication-Token": localStorage.getItem("auth_token") 
                 }
             })
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error("Failed to fetch question");
+                }
+                return res.json();
+            })
             .then(data => {
                 this.question = data;
             })
             .catch(err => console.error("Error fetching question:", err));
         },
 
-        // Update question via API
         updateQuestion() {
-            fetch(`/api/question/${this.$route.params.question_id}`, {
+            if (!this.question_id) {
+                console.error("Question ID is undefined. Cannot update.");
+                return;
+            }
+
+            fetch(`/api/question/${this.question_id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -71,18 +84,19 @@ export default {
                         throw new Error(err.error || "Update failed");
                     });
                 }
-                return response.json();  // ✅ Only calling once
+                return response.json();  
             })
             .then(data => {
                 console.log("Update Response:", data);
                 alert("Question Updated Successfully!");
-                this.$router.go(-1);  // ✅ Redirect back to previous page
+                this.$router.go(-1); 
             })
             .catch(err => console.error("Error updating question:", err));
         }
     },
 
     mounted() {
+        this.question_id = this.$route.params.question_id; // Set question_id properly before fetching
         this.fetchQuestion();
     }
-}
+};

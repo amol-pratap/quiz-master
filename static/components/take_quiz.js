@@ -64,7 +64,7 @@ export default {
             selectedAnswers: {}, 
             timer: null,
             timeRemaining: 0,
-            startTime: null // ✅ Store quiz start time
+            startTime: null 
         };
     },
 
@@ -90,8 +90,8 @@ export default {
                 this.subject_name = data.subject_name || "Unknown Subject";
                 this.chapter_name = data.chapter_name || "Unknown Chapter"; 
                 this.questions = data.questions;
-                this.timeRemaining = this.questions.length * 4 * 60; // Timer = 4 mins per question
-                this.startTime = Date.now();  // ✅ Save start time in milliseconds
+                this.timeRemaining = this.questions.length * 4 * 60; 
+                this.startTime = Date.now();  
                 this.startTimer();
             })
             .catch(error => console.error("Error fetching quiz:", error));
@@ -103,7 +103,7 @@ export default {
                     this.timeRemaining--;
                 } else {
                     clearInterval(this.timer);
-                    this.submitQuiz(); // ✅ Auto-submit on timeout
+                    this.submitQuiz(); 
                 }
             }, 1000);
         },
@@ -131,7 +131,7 @@ export default {
         submitQuiz() {
             clearInterval(this.timer);
             const endTime = Date.now();
-            const timeTaken = Math.floor((endTime - this.startTime) / 1000); // ✅ Calculate time taken in seconds
+            const timeTaken = Math.floor((endTime - this.startTime) / 1000); 
 
             fetch(`/api/submit_quiz/${this.$route.params.quiz_id}`, {
                 method: "POST",
@@ -141,7 +141,7 @@ export default {
                 },
                 body: JSON.stringify({ 
                     answers: this.selectedAnswers,
-                    time_taken: timeTaken // ✅ Send time taken to backend
+                    time_taken: timeTaken 
                 })
             })
             .then(response => response.json())

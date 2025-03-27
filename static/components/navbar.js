@@ -26,10 +26,16 @@ export default {
                                 <router-link v-if="!loggedIn" class="btn btn-primary" to="/login">Login </router-link>
                                 <router-link v-if="!loggedIn" class="btn btn-secondary" to="/sign_up">Sign Up</router-link>
                                 <button v-if="loggedIn" @click="logoutUser" class="btn btn-danger">Logout </button>
-                </div>
                     
-             
+                </div>
+                
+                    
             </div>
+
+            </br>
+            
+            
+            
         </nav>
     `,
 
@@ -37,13 +43,13 @@ export default {
         return {
             // loggedIn: localStorage.getItem('auth_token'),
             // role: localStorage.getItem('role') || 'st'
+            username: localStorage.getItem('username')
         }
     },
     methods:{
         logoutUser(){
             localStorage.clear()
-            // this.$router.go('/')
-            // this.$router.push('/')
+           
             this.$emit('logout')
             this.$router.go('/')
             this.$router.push('/')

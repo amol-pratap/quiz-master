@@ -46,7 +46,7 @@ export default {
                 headers: {
                     "Content-Type": 'application/json'
                 },
-                body: JSON.stringify(this.formData) // the content goes to backend as JSON string
+                body: JSON.stringify(this.formData) 
             })
             .then(response => response.json())
             .then(data => {

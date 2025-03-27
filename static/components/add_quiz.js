@@ -62,12 +62,12 @@ export default {
                     {
                         text: '',
                         options: ['', '', '', ''],
-                        correct_answer: null  // ✅ Ensure null initially
+                        correct_answer: null  
                     }
                 ]
             },
-            chapter_id: this.$route.params.chapter_id,  // ✅ Get chapter ID from route
-            chapter_name: ""  // ✅ Store chapter name
+            chapter_id: this.$route.params.chapter_id,  
+            chapter_name: "" 
         };
     },
 
@@ -78,7 +78,7 @@ export default {
             })
             .then(response => response.json())
             .then(data => {
-                this.chapter_name = data.title;  // ✅ Assign fetched chapter name
+                this.chapter_name = data.title;  
             })
             .catch(error => console.error("Error fetching chapter:", error));
         },
@@ -87,7 +87,7 @@ export default {
             this.quiz.questions.push({
                 text: '',
                 options: ['', '', '', ''],
-                correct_answer: null  // ✅ Reset correctly
+                correct_answer: null 
             });
         },
 
@@ -120,6 +120,6 @@ export default {
     },
 
     mounted() {
-        this.fetchChapter();  // ✅ Fetch chapter name on load
+        this.fetchChapter();  
     }
 }

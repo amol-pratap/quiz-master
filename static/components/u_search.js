@@ -38,8 +38,10 @@ export default {
 
     data() {
         return {
+            
             searchQuery: '',
-            searchType: 'subject', // Default search type
+
+            searchType: 'subject', 
             quizzes: [],
             searched: false
         };

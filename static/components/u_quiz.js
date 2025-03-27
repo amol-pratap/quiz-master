@@ -37,7 +37,7 @@ export default {
     data() {
         return {
             quizzes: [],
-            chapter_id: this.$route.params.chapter_id, // Get chapter_id from URL
+            chapter_id: this.$route.params.chapter_id,
             chapter_title: "" 
         };
     },

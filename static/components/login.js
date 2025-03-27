@@ -16,7 +16,7 @@ export default {
                         <input type="password" class="form-control" id="password" v-model="formData.password" placeholder="Enter Your Password">
                     </div>
                     <div class="mx-2 mb-3 text-center">
-                        <button class="btn btn-primary" @click="loginUser">Login New</button>
+                        <button class="btn btn-primary" @click="loginUser">Login </button>
                         New User ?  <router-link v-if="!loggedIn" class="btn btn-secondary" to="/sign_up">Sign Up</router-link>
                     </div>
                 </div>
@@ -41,13 +41,13 @@ export default {
                 headers: {
                     "Content-Type": 'application/json'
                 },
-                body: JSON.stringify(this.formData) // the content goes to backend as JSON string
+                body: JSON.stringify(this.formData) 
             })
             .then(response => response.json())
             .then(data => { 
                 console.log("good____________________________",data);
                 
-                // if (data && data["auth-token"]){
+                
                 if(Object.keys(data).includes("auth-token")){
                     localStorage.setItem("auth_token", data["auth-token"])
                     localStorage.setItem("id", data.id)
@@ -58,7 +58,7 @@ export default {
                     if(data.roles.includes('admin')){
                         this.$router.push('/admin_dashboard')
                     }else{
-                        this.$router.push('/home') // redirect('/dashboard') in flask
+                        this.$router.push('/home') 
                     }
                     
                 }

@@ -39,7 +39,7 @@ export default {
 
     data() {
         return {
-            searchType: "user", // Default search type
+            searchType: "user", 
             searchQuery: "",
             results: [],
             tableHeaders: []

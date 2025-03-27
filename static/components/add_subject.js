@@ -43,16 +43,16 @@ export default {
                 })
                 .then(response => {
                     if (!response.ok) {
-                        return response.json().then(err => { throw new Error(err.error); }); // ✅ Catch API error
+                        return response.json().then(err => { throw new Error(err.error); }); 
                     }
                     return response.json();
                 })
                 .then(data => {
                     alert("✅ " + data.message);
-                    this.$router.push("/admin_dashboard");  // ✅ Redirect after success
+                    this.$router.push("/admin_dashboard");  
                 })
                 .catch(error => {
-                    alert("Error " + error.message); // ✅ Show error message
+                    alert("Error " + error.message); 
                     console.error("Error adding subject:", error);
                 });
             }

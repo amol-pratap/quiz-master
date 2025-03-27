@@ -31,7 +31,7 @@ export default {
 
     data() {
         return {
-            quiz_id: this.$route.params.quiz_id, // Get quiz_id from URL
+            quiz_id: this.$route.params.quiz_id,
             question: {
                 text: '',
                 options: [
@@ -40,7 +40,7 @@ export default {
                     { text: '' },
                     { text: '' }
                 ],
-                correct_option: null // Index of the correct answer
+                correct_option: null 
             },
             message: ''
         };
@@ -69,7 +69,7 @@ export default {
                 if (data.success) {
                     setTimeout(() => {
                         this.$router.go(-1);
-                    }, 500); // Redirect after 2 seconds
+                    }, 500); 
                 }
             })
             .catch(error => console.error("Error submitting question:", error));

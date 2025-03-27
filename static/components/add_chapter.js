@@ -20,7 +20,7 @@ export default {
                 name: '',
                 subject_id: this.$route.params.subject_id
             },
-            subjectName: ""  // To store the subject name
+            subjectName: ""  
         };
     },
 
@@ -31,7 +31,7 @@ export default {
             })
             .then(response => response.json())
             .then(data => {
-                this.subjectName = data.name;  // Set subject name for display
+                this.subjectName = data.name;  
             })
             .catch(error => console.error("Error fetching subject:", error));
         },
@@ -48,7 +48,7 @@ export default {
             .then(response => response.json())
             .then(() => {
                 alert("✅ Chapter added successfully!");
-                this.$router.go(-1);  // ✅ Go back to the previous page
+                this.$router.go(-1);  
             })
             .catch(error => {
                 console.error("Error adding chapter:", error);
@@ -58,6 +58,6 @@ export default {
     },
 
     mounted() {
-        this.fetchSubject();  // Load the subject name when the page loads
+        this.fetchSubject();  
     }
 };

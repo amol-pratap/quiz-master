@@ -1,8 +1,10 @@
 export default {
     template: `
     <div>
+         <h3> welcome {{username}}  </h3>
         <h2 class="text-center my-3">Subjects</h2>
 
+               
         <div class="row">
             <div v-for="subject in subjects" :key="subject.id" class="col-md-4 mb-3">
                 <div class="card shadow-sm">
@@ -66,9 +68,10 @@ export default {
         </div>
     </div>`,
 
-    data() {
+    data: function() {
         return {
-            subjects: []
+            subjects: [],
+            username: localStorage.getItem('username')
         }
     },
 
@@ -127,7 +130,7 @@ export default {
                 .then(response => {
                     if (response.ok) {
                         alert("Chapter deleted successfully!");
-                        this.fetchSubjects();  // Refresh data
+                        this.fetchSubjects();  
                     } else {
                         alert("Failed to delete chapter.");
                     }

@@ -63,13 +63,13 @@ export default {
     data() {
         return {
             quizzes: [],
-            chapter_id: this.$route.params.chapter_id, // Get chapter_id from URL
-            chapter_title: "" // To display the chapter title dynamically
+            chapter_id: this.$route.params.chapter_id, 
+            chapter_title: "" 
         }
     },
 
     methods: {
-        fetchQuizzes() {      //To display all quizess and their quetions
+        fetchQuizzes() {      
             fetch(`/api/quizzes?chapter_id=${this.chapter_id}`, {
                 headers: {
                     "Authentication-Token": localStorage.getItem('auth_token')
@@ -78,7 +78,7 @@ export default {
             .then(response => response.json())
             .then(data => {
                 this.quizzes = data.quizzes;
-                this.chapter_title = data.chapter_title; // Display chapter title
+                this.chapter_title = data.chapter_title; 
             })
             .catch(error => console.error("Error fetching quizzes:", error));
         },

@@ -465,6 +465,107 @@ def admin_search():
 
 
 
+# @app.route('/api/admin_summary', methods=['GET'])
+# @auth_required('token')
+# @roles_required('admin')
+# def admin_summary():
+#     summary_query = """
+#         SELECT 
+#             (SELECT COUNT(*) FROM user) AS total_users,
+#             (SELECT COUNT(*) FROM subject) AS total_subjects,
+#             (SELECT COUNT(*) FROM chapter) AS total_chapters,
+#             (SELECT COUNT(*) FROM quiz) AS total_quizzes,
+#             (SELECT COUNT(*) FROM attemptscores) AS total_attempts,
+#             (SELECT COUNT(DISTINCT user_id) FROM attemptscores) AS unique_users_attempted
+#     """
+    
+#     result = db.session.execute(text(summary_query)).fetchone()
+    
+#     if result:
+#         response = {
+#             "total_users": result.total_users -1,
+#             "total_subjects": result.total_subjects,
+#             "total_chapters": result.total_chapters,
+#             "total_quizzes": result.total_quizzes,
+#             "total_attempts": result.total_attempts,
+#             "unique_users_attempted": result.unique_users_attempted
+#         }
+#     else:
+#         response = {
+#             "total_users": 0,
+#             "total_subjects": 0,
+#             "total_chapters": 0,
+#             "total_quizzes": 0,
+#             "total_attempts": 0,
+#             "unique_users_attempted": 0
+#         }
+
+#     return jsonify(response), 200
+
+@app.route('/api/admin_summary', methods=['GET'])
+@auth_required('token')
+@roles_required('admin')
+def admin_summary():
+    summary_query = """
+        SELECT 
+            (SELECT COUNT(*) FROM user) AS total_users,
+            (SELECT COUNT(*) FROM subject) AS total_subjects,
+            (SELECT COUNT(*) FROM chapter) AS total_chapters,
+            (SELECT COUNT(*) FROM quiz) AS total_quizzes,
+            (SELECT COUNT(*) FROM attemptscores) AS total_attempts,
+            (SELECT COUNT(DISTINCT user_id) FROM attemptscores) AS unique_users_attempted
+    """
+    
+    quiz_summary_query = """
+        SELECT 
+            q.id AS quiz_id,
+            q.title AS quiz_title,
+            c.title AS chapter_title,
+            s.name AS subject_name,
+            COUNT(a.id) AS total_attempts,
+            COUNT(DISTINCT a.user_id) AS unique_users_attempted,
+            MAX(a.score) AS best_score,
+            ROUND(SUM(a.score) * 1.0 / COUNT(a.id), 2) AS average_score,
+            (SELECT COUNT(*) FROM question WHERE question.quiz_id = q.id) AS total_questions,
+            COALESCE(SUM(a.score), 0) AS total_score_sum
+        FROM quiz q
+        JOIN chapter c ON q.chapter_id = c.id
+        JOIN subject s ON c.subject_id = s.id
+        LEFT JOIN attemptscores a ON q.id = a.quiz_id
+        GROUP BY q.id, q.title, c.title, s.name
+        ORDER BY total_attempts DESC;
+    """
+    
+    result = db.session.execute(text(summary_query)).fetchone()
+    quiz_results = db.session.execute(text(quiz_summary_query)).fetchall()
+    
+    # Construct summary response
+    response = {
+        "total_users": result.total_users,
+        "total_subjects": result.total_subjects,
+        "total_chapters": result.total_chapters,
+        "total_quizzes": result.total_quizzes,
+        "total_attempts": result.total_attempts,
+        "unique_users_attempted": result.unique_users_attempted,
+        "quiz_summary": [
+            {
+                "quiz_id": row.quiz_id,
+                "quiz_title": row.quiz_title,
+                "chapter_title": row.chapter_title,
+                "subject_name": row.subject_name,
+                "total_attempts": row.total_attempts,
+                "unique_users_attempted": row.unique_users_attempted,
+                "best_score": row.best_score if row.best_score is not None else 0,
+                "average_score": row.average_score if row.average_score is not None else 0,
+                "total_questions": row.total_questions,
+                "total_score_sum": row.total_score_sum
+            } 
+            for row in quiz_results
+        ]
+    }
+
+    return jsonify(response), 200
+
 
 
 
