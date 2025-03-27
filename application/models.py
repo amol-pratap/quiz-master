@@ -74,6 +74,7 @@ class Attemptscores(db.Model):
     quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'), nullable=False)
     score = db.Column(db.Integer, nullable=False)
     timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
+    time_taken = db.Column(db.Integer, nullable=False, default=0)
     quiz = db.relationship('Quiz', backref=db.backref('attempts', lazy=True))
     responses = db.relationship('AttemptResponse', backref='attempt', lazy=True)
     
@@ -83,6 +84,6 @@ class AttemptResponse(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     attempt_id = db.Column(db.Integer, db.ForeignKey('attemptscores.id'), nullable=False)
     question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)
-    selected_option_id = db.Column(db.Integer, db.ForeignKey('option.id'), nullable=False)
+    selected_option_id = db.Column(db.Integer, db.ForeignKey('option.id'))
     correct = db.Column(db.Boolean, nullable=False)
     # question = db.relationship('Question', backref=db.backref('responses', lazy=True))    

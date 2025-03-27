@@ -32,21 +32,29 @@ export default {
         },
 
         methods:{
-            create_subject(){
-            fetch('/api/subject',{
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authentication-Token": localStorage.getItem('auth_token')
-                },
-                body: JSON.stringify(this.subject)
+            create_subject() {
+                fetch("/api/subject", {
+                    method: "POST",
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "Authentication-Token": localStorage.getItem("auth_token") 
+                    },
+                    body: JSON.stringify(this.subject)
                 })
-                .then(response => response.json())
-                .then(data =>{
-                    console.log("Response Data:",data)
-                    this.subjects = data
-                    this.$router.push('/admin_dashboard')
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw new Error(err.error); }); // ✅ Catch API error
+                    }
+                    return response.json();
                 })
+                .then(data => {
+                    alert("✅ " + data.message);
+                    this.$router.push("/admin_dashboard");  // ✅ Redirect after success
+                })
+                .catch(error => {
+                    alert("Error " + error.message); // ✅ Show error message
+                    console.error("Error adding subject:", error);
+                });
             }
 
             

@@ -36,7 +36,14 @@ export default {
                     "Authentication-Token": localStorage.getItem("auth_token")
                 },
                 body: JSON.stringify(this.subject)
-            }).then(() => alert("Subject Updated Successfully!"));
+            }) .then(response => {
+                if (!response.ok) {  
+                    return response.json().then(err => { throw new Error(err.error || alert("You can not update sunbect!") && "Update failed"); });
+                    
+                }
+                return response.json();  
+            })
+            .then(() => alert("Subject Updated Successfully!"));
             this.$router.go(-1)
         }
     },

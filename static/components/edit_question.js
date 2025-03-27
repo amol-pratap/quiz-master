@@ -25,23 +25,23 @@ export default {
             </form>
         </div>
     `,
+
     data() {
         return {
             question_id: this.$route.params.question_id, // Get question_id from URL
             question: {
-                id:"",
+                id: "",
                 text: "",
                 correct_option_id: "",
                 options: [] // Exactly 4 options
-                
             }
         };
     },
+
     methods: {
         // Fetch question details from API
         fetchQuestion() {
-            // fetch(`/api/get/${this.question_id}`, {
-                fetch(`/api/question/${this.question_id}`, {
+            fetch(`/api/question/${this.question_id}`, {
                 method: "GET",
                 headers: { 
                     "Content-Type": "application/json",
@@ -58,8 +58,6 @@ export default {
         // Update question via API
         updateQuestion() {
             fetch(`/api/question/${this.$route.params.question_id}`, {
-            // console.log("ERRor----",)
-                // fetch(`/api/update_question/${this.question_id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -69,18 +67,21 @@ export default {
             })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error(`Failed to update question: ${response.statusText}`);
+                    return response.json().then(err => {
+                        throw new Error(err.error || "Update failed");
+                    });
                 }
-                return response.json();
+                return response.json();  // ✅ Only calling once
             })
             .then(data => {
                 console.log("Update Response:", data);
                 alert("Question Updated Successfully!");
-                this.$router.go(-1);  // ✅ Redirect back to quiz page
+                this.$router.go(-1);  // ✅ Redirect back to previous page
             })
             .catch(err => console.error("Error updating question:", err));
         }
     },
+
     mounted() {
         this.fetchQuestion();
     }

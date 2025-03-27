@@ -1,52 +1,63 @@
 export default {
-    template:`
-    <div>
-        <h2> New Chapter </h2>
-        <div class="">
-           
-            <div>  {{message}} </div>
+    template: `
+    <div class="container mt-4">
+        <h2 class="text-center">Add New Chapter</h2>
+        <p class="text-muted text-center">Subject: <strong>{{ subjectName }}</strong></p>
 
-                <div class="mb-3">
-                    <label for="name" class="form-label">Chaptert Name</label>
-                    <input type="text"id="name" v-model="chapter.name" class="form-control" placeholder="Enter Chapter name" required />
-                </div>
+        <div class="card p-4 shadow-sm">
+            <div class="mb-3">
+                <label class="form-label">Chapter Name</label>
+                <input type="text" v-model="chapter.name" class="form-control" placeholder="Enter Chapter Name" required />
+            </div>
 
-               
-
-                <button @click="create_chapter" class="btn btn-primary w-100">Add Chapter ➕ </button>
-        
+            <button @click="createChapter" class="btn btn-primary w-100">➕ Add Chapter</button>
         </div>
-
     </div>`,
-    data: function(){
+
+    data() {
         return {
             chapter: {
                 name: '',
                 subject_id: this.$route.params.subject_id
-                },
-                Message:""
-            }
+            },
+            subjectName: ""  // To store the subject name
+        };
+    },
+
+    methods: {
+        fetchSubject() {
+            fetch(`/api/subject/${this.chapter.subject_id}`, {
+                headers: { "Authentication-Token": localStorage.getItem('auth_token') }
+            })
+            .then(response => response.json())
+            .then(data => {
+                this.subjectName = data.name;  // Set subject name for display
+            })
+            .catch(error => console.error("Error fetching subject:", error));
         },
 
-        methods:{
-            create_chapter(){
-            fetch('/api/chapter',{
+        createChapter() {
+            fetch('/api/chapter', {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json",
                     "Authentication-Token": localStorage.getItem('auth_token')
                 },
                 body: JSON.stringify(this.chapter)
-                })
-                .then(response => response.json())
-                .then(data =>{
-                    console.log("Response Data:",data)
-                    this.chapters = data
-                    this.$router.push('/admin_dashboard')
-                })
-            }
-
-            
+            })
+            .then(response => response.json())
+            .then(() => {
+                alert("✅ Chapter added successfully!");
+                this.$router.go(-1);  // ✅ Go back to the previous page
+            })
+            .catch(error => {
+                console.error("Error adding chapter:", error);
+                alert("❌ Error adding chapter!");
+            });
         }
-   
-}
+    },
+
+    mounted() {
+        this.fetchSubject();  // Load the subject name when the page loads
+    }
+};

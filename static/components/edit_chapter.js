@@ -32,7 +32,14 @@ export default {
                     "Authentication-Token": localStorage.getItem("auth_token")
                 },
                 body: JSON.stringify(this.chapter)
-            }).then(() => alert("Chapter Updated Successfully!"));
+            }).then(response => {
+                if (!response.ok) {  
+                    return response.json().then(err => { throw new Error(err.error || alert("You can not update chapter!") && "Update failed"); });
+                    
+                }
+                return response.json();  
+            })
+            .then(() => alert("Chapter Updated Successfully!"));
            
             this.$router.go(-1);
         }

@@ -1,4 +1,5 @@
 export default {
+    props: ['loggedIn', 'role'],
     template: `
     <div class="row border">
         <div class="col" style="height: 750px;">
@@ -15,7 +16,8 @@ export default {
                         <input type="password" class="form-control" id="password" v-model="formData.password" placeholder="Enter Your Password">
                     </div>
                     <div class="mx-2 mb-3 text-center">
-                        <button class="btn btn-primary" @click="loginUser">Login</button>
+                        <button class="btn btn-primary" @click="loginUser">Login New</button>
+                        New User ?  <router-link v-if="!loggedIn" class="btn btn-secondary" to="/sign_up">Sign Up</router-link>
                     </div>
                 </div>
             </div>
@@ -50,16 +52,9 @@ export default {
                     localStorage.setItem("auth_token", data["auth-token"])
                     localStorage.setItem("id", data.id)
                     localStorage.setItem("username", data.username)
+                    localStorage.setItem("role", data.role)
                     
-                    
-                    // if (data["role"] == "user"){
-                    //     localStorage.setItem("role", "user")
-                    //     this.$router.push('/home')
-                    //     } 
-                    // else {
-                    //     localStorage.setItem("role", "admin")
-                    //     this.$router.push('/admin_dashboard')
-                    //     }
+                    this.$emit('login')
                     if(data.roles.includes('admin')){
                         this.$router.push('/admin_dashboard')
                     }else{

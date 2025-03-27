@@ -132,7 +132,8 @@ class ChapterResource(Resource):
 
 class QuizResource(Resource):
     @auth_required('token')
-    @roles_required('admin')
+    # @roles_required('admin')
+    @roles_accepted('user','admin')
     def get(self, quiz_id):
         quiz = Quiz.query.get(quiz_id)
         if not quiz:

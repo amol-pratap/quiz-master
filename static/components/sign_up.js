@@ -23,6 +23,7 @@ export default {
                     </div>
                     <div>
                         <button center class="btn btn-primary" @click="addUser">Register</button>
+                    <div>    Existing User ?  <router-link v-if="!loggedIn" class="btn btn-primary" to="/login">Login</router-link>   </div>
                     </div>
                 </div>
             </div>
