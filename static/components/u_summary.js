@@ -32,7 +32,9 @@ export default {
                         <td>
                             <router-link :to="'/score/' + quiz.quiz_id" class="btn btn-outline-info btn-sm">
                                 📜 View Attempts
+                                 
                             </router-link>
+                            <button @click="() =>csvExport(quiz.quiz_id)" class="btn btn-secondary">Download CSV</button>
                         </td>
                     </tr>
                 </tbody>
@@ -62,8 +64,26 @@ export default {
                 this.summary = data.summary || [];
             })
             .catch(error => console.error("Error fetching user summary:", error));
-        }
+        },
+
+        csvExport(quiz_id){
+            console.log("id-----------",this.quiz_id)
+             fetch(`/api/export/${quiz_id}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                         "Authentication-Token": localStorage.getItem('auth_token') 
+                        }
+            })
+            .then(response => response.json())
+            .then(data => {
+                window.location.href = `/api/csv_result/${data.id}`
+            })
+        },
+
     },
+
+    
 
     mounted() {
         this.fetchUserSummary();

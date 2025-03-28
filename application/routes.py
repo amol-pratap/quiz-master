@@ -1,10 +1,15 @@
 from .database import db 
 from .models import *
-from flask import current_app as app, jsonify, request,render_template
+from flask import current_app as app, jsonify, request,render_template,  send_from_directory
 # from flask_security import hash_password, auth_required, roles_required, current_user
 from flask_security import auth_required, roles_required, roles_accepted, current_user, login_user
 from werkzeug.security import check_password_hash, generate_password_hash
 from .utils import roles_list
+
+from celery.result import AsyncResult
+from .tasks import csv_report  #, monthly_report, delivery_report
+# from .tasks import *
+from sqlalchemy.sql import text
 
 from flask_security.utils import verify_password
 from datetime import datetime
@@ -714,8 +719,8 @@ def submit_quiz(quiz_id):
 #     return jsonify({"attempts": attempt_data}), 200
 
 @app.route('/api/quiz_summary/<int:quiz_id>', methods=['GET'])
-@auth_required('token')
-@roles_required('user')
+# @auth_required('token')
+# @roles_required('user')
 def quiz_summary(quiz_id):
     quiz = Quiz.query.get(quiz_id)
     if not quiz:
@@ -855,52 +860,8 @@ def search_quiz():
 
 
 
-# @app.route('/api/user_summary', methods=['GET'])
-# @auth_required('token')
-# @roles_required('user')
-# def get_user_summary():
-#     user_id = current_user.id
 
-#     # Fetch all quizzes the user has attempted
-#     attempted_quizzes = db.session.query(
-#         Quiz.id.label("quiz_id"),
-#         Quiz.title.label("quiz_title"),
-#         Subject.name.label("subject_name"),
-#         Chapter.title.label("chapter_title"),
-#         db.func.count(Attemptscores.id).label("attempts"),
-#         db.func.max(Attemptscores.score).label("best_score"),
-#         db.func.sum(Attemptscores.score).label("total_obtained_marks"),
-#         db.func.avg(Attemptscores.score).label("average_score_raw"),  # ✅ Avg Score (Raw)
-#         (db.func.count(Question.id) * 4).label("total_marks")  # ✅ Total Marks of Quiz
-#     ).join(Attemptscores, Attemptscores.quiz_id == Quiz.id) \
-#      .join(Chapter, Quiz.chapter_id == Chapter.id) \
-#      .join(Subject, Chapter.subject_id == Subject.id) \
-#      .join(Question, Question.quiz_id == Quiz.id) \
-#      .filter(Attemptscores.user_id == user_id) \
-#      .group_by(Quiz.id, Quiz.title, Subject.name, Chapter.title) \
-#      .order_by(db.desc(db.func.max(Attemptscores.timestamp)))  # Sort by latest attempt
 
-#     # Format response
-#     summary_data = []
-#     for quiz in attempted_quizzes:
-#         # ✅ Compute correct average score formula
-#         average_score = round((quiz.average_score_raw / quiz.total_marks) * 100, 2) if quiz.total_marks > 0 else 0
-
-#         summary_data.append({
-#             "quiz_id": quiz.quiz_id,
-#             "quiz_title": quiz.quiz_title,
-#             "subject_name": quiz.subject_name,
-#             "chapter_title": quiz.chapter_title,
-#             "attempts": quiz.attempts,
-#             "best_score": quiz.best_score,  # ✅ Keep Best Score
-#             "total_obtained_marks": quiz.total_obtained_marks,  # ✅ Total Score in All Attempts
-#             "total_marks": quiz.total_marks,  # ✅ Total Marks of the Quiz
-#             "average_score": average_score  # ✅ Corrected Average Score
-#         })
-
-#     return jsonify({"summary": summary_data}), 200
-
-from sqlalchemy.sql import text
 
 
 @app.route('/api/user_summary', methods=['GET'])
@@ -945,3 +906,28 @@ def user_summary():
         })
 
     return jsonify({"summary": summary_data}), 200
+
+    
+    
+    
+    
+#exports things
+@app.route('/api/export/<int:quiz_id>') # this manually triggers the job
+def export_csv(quiz_id):
+    user_id = current_user.id
+    result = csv_report.delay(quiz_id, user_id) # async object
+    print("REady-----------------------------------------------------",result.id,"-----", result.result)
+    return jsonify({
+        "id": result.id,
+        "result": result.result,
+
+    })
+    
+
+@app.route('/api/csv_result/<id>') # just create to test the status of result
+def csv_result(id):
+    res = AsyncResult(id)
+    print("csV+result _________________________ready-------------------------------------------------------------------------------------------------------",res,"-------",res.result)
+    if res:  
+        return send_from_directory('static', res.result)
+    return jsonify({"message": "result not found"}), 404
