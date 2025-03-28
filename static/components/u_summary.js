@@ -27,7 +27,7 @@ export default {
                             {{ quiz.best_score }} / {{ quiz.total_questions * 4 }}
                         </td>
                         <td class="fw-bold text-warning">
-                            {{ quiz.total_score / quiz.attempts }} / {{ quiz.total_questions * 4 }}
+                            {{ (quiz.total_score / quiz.attempts).toFixed(2) }} / {{ quiz.total_questions * 4 }}
                         </td>
                         <td>
                             <router-link :to="'/score/' + quiz.quiz_id" class="btn btn-outline-info btn-sm">

@@ -7,7 +7,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from .utils import roles_list
 
 from celery.result import AsyncResult
-from .tasks import csv_report  #, monthly_report, delivery_report
+from .tasks import csv_report, monthly_report  #, delivery_report
 # from .tasks import *
 from sqlalchemy.sql import text
 
@@ -546,7 +546,7 @@ def admin_summary():
     
     # Construct summary response
     response = {
-        "total_users": result.total_users,
+        "total_users": result.total_users - 1,
         "total_subjects": result.total_subjects,
         "total_chapters": result.total_chapters,
         "total_quizzes": result.total_quizzes,
@@ -679,48 +679,9 @@ def submit_quiz(quiz_id):
 
 
 
-
-
-
-
-
-# #To display quiz scores
-# @app.route('/api/quiz_scores/<int:quiz_id>', methods=['GET'])
-# @auth_required('token')
-# @roles_required('user')
-# def get_quiz_scores(quiz_id):
-#     user_id = current_user.id
-#     attempts = Attemptscores.query.filter_by(user_id=user_id, quiz_id=quiz_id).order_by(Attemptscores.timestamp.desc()).all()
-
-#     attempt_data = []
-#     for idx, attempt in enumerate(attempts, start=1):
-#         responses = AttemptResponse.query.filter_by(attempt_id=attempt.id).all()
-#         correct = sum(1 for r in responses if r.correct)
-#         total_questions = len(responses)
-#         obtained_marks = correct * 4
-#         total_marks = total_questions * 4
-#         incorrect = total_questions - correct
-#         unattempted = sum(1 for r in responses if r.selected_option_id is None)
-#         percentage = round((obtained_marks / total_marks) * 100, 2) if total_marks else 0
-
-#         attempt_data.append({
-#             "attempt_id": attempt.id,
-#             "attempt_no": idx,
-#             "total_questions": total_questions,
-#             "correct_answers": correct,
-#             "incorrect_answers": incorrect,
-#             "unattempted": unattempted,
-#             "total_marks": total_marks,
-#             "obtained_marks": obtained_marks,
-#             "percentage": percentage,
-#             "time_taken": round((datetime.utcnow() - attempt.timestamp).total_seconds() / 60, 2)
-#         })
-
-#     return jsonify({"attempts": attempt_data}), 200
-
-@app.route('/api/quiz_summary/<int:quiz_id>', methods=['GET'])
-# @auth_required('token')
-# @roles_required('user')
+@app.route('/api/quiz_summary/<int:quiz_id>', methods=['GET'])  #summay of all atrtempts of on quiz
+@auth_required('token')
+@roles_required('user')
 def quiz_summary(quiz_id):
     quiz = Quiz.query.get(quiz_id)
     if not quiz:
@@ -864,13 +825,13 @@ def search_quiz():
 
 
 
-@app.route('/api/user_summary', methods=['GET'])
+@app.route('/api/user_summary', methods=['GET'])     # Summary of all quiz given by a user
 @auth_required('token')
 @roles_required('user')
 def user_summary():
-    user_id = current_user.id  # Get the logged-in user's ID
+    user_id = current_user.id  
 
-    # Fetch best score, attempt count, sum of scores, and total questions for each attempted quiz
+
     summary_query = """
         SELECT 
             q.id AS quiz_id, 

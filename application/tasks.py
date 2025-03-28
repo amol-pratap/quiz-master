@@ -1,9 +1,10 @@
 from celery import shared_task
 from .models import *
 from .utils import format_report
-# from .mail import send_email
+from .mail import send_email
 import datetime
 import csv
+from sqlalchemy.sql import text
 # import requests #plural
 import json
 # from .routes import quiz_summary
@@ -33,6 +34,67 @@ def csv_report(quiz_id, user_id):
             sr_no += 1
 
     return csv_file_name
+
+
+
+
+
+@shared_task(ignore_results = False, name = "monthly_report")
+def monthly_report():
+    users = User.query.all()
+    for user in users[1:]:
+        user_data = {}
+        user_data['username'] = user.username
+        user_data['email'] = user.email
+        user_id = user.id
+
+        summary_query = """
+            SELECT 
+                q.id AS quiz_id, 
+                q.title AS quiz_title,
+                c.title AS chapter_title,
+                s.name AS subject_name,
+                COUNT(a.id) AS attempts_count,
+                MAX(a.score) AS best_score,
+                SUM(a.score) AS total_score,
+                (SELECT COUNT(id) FROM question WHERE quiz_id = q.id) AS total_questions
+            FROM attemptscores a
+            JOIN quiz q ON a.quiz_id = q.id
+            JOIN chapter c ON q.chapter_id = c.id
+            JOIN subject s ON c.subject_id = s.id
+            WHERE a.user_id = :user_id
+            GROUP BY q.id, q.title, c.title, s.name;
+        """
+
+        result = db.session.execute(text(summary_query), {"user_id": user_id}).fetchall()
+
+        summary_data = []
+        
+        for row in result:
+            summary_data.append({
+                "quiz_id": row.quiz_id,
+                "quiz_title": row.quiz_title,
+                "chapter_title": row.chapter_title,
+                "subject_name": row.subject_name,
+                "attempts": row.attempts_count,   # Total attempts for this quiz
+                "best_score": row.best_score,     # Best score in all attempts
+                "total_score": row.total_score,   # Sum of scores in all attempts
+                "total_questions": row.total_questions  # Total questions in that quiz
+            })
+            
+        user_data['all_quiz'] = summary_data
+        message = format_report('templates/mail_details.html', user_data)
+        send_email(user.email, subject = "Monthly Summary Report of Quizzes - QUIZ - Master", message = message)
+    return "Monthly summary report sent"
+        
+
+
+
+
+
+
+
+
 
 # @shared_task(ignore_results = False, name = "monthly_report")
 # def monthly_report():

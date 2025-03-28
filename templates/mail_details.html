@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transactions for this Month</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <img src="static/logistics_details.png" alt="t_datails">
+        </div>
+        <div class="row">
+            <h1 class="text-center mt-2">Quiz Summary</h1>
+            <p class="fs-3">Hello {{data['username']}}</p>
+            <p class="fs-5">Please refer to the monthly attempted quizzes  made by you in this month</p>
+        </div>
+        <div class="row">
+            <table class="table table-striped mx-2">
+                <thead>
+                    <tr>
+                        <th scope="col">Sr No</th>
+                        <th scope="col">Subject</th>
+                        <th scope="col">Chapter</th>
+                        <th scope="col">Quiz Name</th>
+                        <th scope="col">No. of Attempts</th>
+                        <th scope="col">Best Score</th>
+                        <th scope="col">Average Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for q in data['all_quiz'] %}
+                    <tr>
+                        <th scope="row">{{loop.index}}</th>
+                        <td>{{q['subject_name']}}</td>
+                        <td>{{q['chapter_title']}}</td>
+                        <td>{{q['quiz_title']}}</td>
+                        <td>{{q['attempts']}}</td>
+                        <td>{{q['best_score']}}/{{q['total_questions']*4}}</td>
+                        <td>{{(q['total_score']/q['attempts']) | round(2)}}/{{q['total_questions']*4}}</td>
+                    </tr>
+                    {% endfor %}
+                    
+                </tbody>  
+            </table>
+            <p class="fs-5">
+                Thank you for choosing Quiz - Master. 
+            </p>
+        </div>
+
+        <!--
+        <div class="row">
+            <div class="col-10"></div>
+            <div class="col-2">
+                <img src="static/stamp.jpg" alt="Company stamp" style="width: 150px;">
+            </div>
+        </div>
+        -->
+
+        <div class="row">
+            <p class="text-center mt-2">
+                © copyright 2025 | Quiz Master - All Rights Reserved
+            </p>
+        </div>
+    </div>
+    
+</body>
+</html>
