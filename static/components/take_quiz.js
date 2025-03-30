@@ -1,12 +1,12 @@
 export default {
     template: `
     <div class="container mt-4">
-        <p class="text-center text-muted">📘 Subject: <strong>{{ subject_name }}</strong> | 📖 Chapter: <strong>{{ chapter_name }}</strong></p>
+        <p class="text-center text-muted"> Subject: <strong>{{ subject_name }}</strong> |  Chapter: <strong>{{ chapter_name }}</strong></p>
         <h2 class="text-center">Quiz: {{ quiz.title }}</h2>
-        <p class="text-center text-muted">⏳ Time Remaining: {{ formattedTime }}</p>
+        <p class="text-center text-muted"> Time Remaining: {{ formattedTime }}</p>
 
         <div class="row">
-            <!-- Main Quiz Section -->
+           
             <div class="col-md-8">
                 <div v-if="currentQuestion" class="card shadow-sm p-4">
                     <h5>Q{{ currentIndex + 1 }}: {{ currentQuestion.text }}</h5>
@@ -23,20 +23,20 @@ export default {
                     </div>
                 </div>
 
-                <!-- Navigation Buttons -->
+            
                 <div class="d-flex justify-content-between mt-3">
                     <button class="btn btn-secondary btn-sm px-4" @click="prevQuestion">⬅ Previous</button>
                     <button class="btn btn-primary btn-sm px-4" @click="saveAndNext"> Save & Next</button>
                     <button class="btn btn-secondary btn-sm px-4" @click="nextQuestion">Next ➡</button>
                 </div>
 
-                <!-- Submit Button -->
+          
                 <div class="text-center mt-3">
-                    <button class="btn btn-success btn-lg px-5" @click="submitQuiz">✅ Submit</button>
+                    <button class="btn btn-success btn-lg px-5" @click="submitQuiz"> Submit</button>
                 </div>
             </div>
 
-            <!-- Question Navigation Panel -->
+        
             <div class="col-md-4">
                 <div class="card p-3 shadow-sm">
                     <h5 class="text-center text-primary"> Navigate Questions</h5>

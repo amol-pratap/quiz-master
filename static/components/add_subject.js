@@ -48,7 +48,7 @@ export default {
                     return response.json();
                 })
                 .then(data => {
-                    alert("✅ " + data.message);
+                    alert(data.message);
                     this.$router.push("/admin_dashboard");  
                 })
                 .catch(error => {

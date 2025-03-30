@@ -2,7 +2,7 @@ export default {
     template: `
     <div class="container-fluid min-vh-100 d-flex flex-column align-items-center bg-dark text-white py-5">
         <p class="text-center "><strong>{{ subject_name }}</strong></p>
-        <h2 class="text-center mb-4 fw-bold text-warning display-4">📚 {{ chapter_title }}</h2>
+        <h2 class="text-center mb-4 fw-bold text-warning display-4"> {{ chapter_title }}</h2>
 
         <div class="container">
             <div class="row justify-content-center">
@@ -10,7 +10,7 @@ export default {
                     <div class="card shadow-lg border-0 rounded-4 overflow-hidden" 
                          style="background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05)); backdrop-filter: blur(15px);">
 
-                        <!-- Animated Gradient Header -->
+                      
                         <div class="card-header text-center fw-bold text-white py-3"
                              style="background: linear-gradient(135deg, #ff416c, #ff4b2b); border-bottom: 4px solid rgba(255,255,255,0.2);">
                             {{ quiz.title }}
@@ -23,7 +23,7 @@ export default {
                                 <router-link :to="'/take_quiz/' + quiz.id" 
                                              class="btn btn-lg fw-bold w-100 text-dark"
                                              style="background: linear-gradient(135deg, #ff9a9e, #fad0c4); border-radius: 30px; box-shadow: 0px 4px 10px rgba(255, 154, 158, 0.4);">
-                                    📝 Attempt Quiz
+                                     Attempt Quiz
                                 </router-link>
                             </div>
                         </div>

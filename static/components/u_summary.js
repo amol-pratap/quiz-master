@@ -32,9 +32,8 @@ export default {
                         <td>
                             <router-link :to="'/score/' + quiz.quiz_id" class="btn btn-outline-info btn-sm">
                                 📜 View Attempts
-                                 
                             </router-link>
-                            <button @click="() =>csvExport(quiz.quiz_id)" class="btn btn-secondary">Download CSV</button>
+                            <button @click="csvExport(quiz.quiz_id)" class="btn btn-secondary btn-sm">⬇ Download CSV</button>
                         </td>
                     </tr>
                 </tbody>
@@ -45,12 +44,24 @@ export default {
         <div v-else class="text-center text-muted mt-4">
             <p class="fs-5">😕 No quizzes attempted yet.</p>
         </div>
+
+        <!-- Chart Section -->
+        <div class="container mt-4 text-center">
+            <h2 class="text-primary">📊 Subject-wise Quiz Attempts</h2>
+            <div class="d-flex justify-content-center">
+                <div class="w-50">
+                    <canvas id="quizAttemptsChart"></canvas>
+                </div>
+            </div>
+        </div>
     </div>
     `,
 
     data() {
         return {
-            summary: []
+            summary: [],
+            attemptsData: [],
+            chart: null
         };
     },
 
@@ -66,26 +77,71 @@ export default {
             .catch(error => console.error("Error fetching user summary:", error));
         },
 
-        csvExport(quiz_id){
-            console.log("id-----------",this.quiz_id)
-             fetch(`/api/export/${quiz_id}`, {
+        async fetchQuizAttempts() {
+            try {
+                const response = await fetch('/api/user/quiz_attempts', {
+                    headers: { "Authentication-Token": localStorage.getItem('auth_token') }
+                });
+                const data = await response.json();
+                this.attemptsData = data;
+                this.renderChart();
+            } catch (error) {
+                console.error("Error fetching quiz attempts:", error);
+            }
+        },
+
+        renderChart() {
+            const ctx = document.getElementById("quizAttemptsChart").getContext("2d");
+
+            // Destroy previous chart instance if exists
+            if (this.chart) this.chart.destroy();
+
+            this.chart = new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: this.attemptsData.map(item => item.subject),
+                    datasets: [{
+                        label: "No. of Attempts",
+                        data: this.attemptsData.map(item => item.attempts),
+                        backgroundColor: "rgba(54, 162, 235, 0.6)",
+                        borderColor: "rgba(54, 162, 235, 1)",
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        },
+
+        csvExport(quiz_id) {
+            fetch(`/api/export/${quiz_id}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
-                         "Authentication-Token": localStorage.getItem('auth_token') 
-                        }
+                    "Authentication-Token": localStorage.getItem('auth_token')
+                }
             })
             .then(response => response.json())
             .then(data => {
-                window.location.href = `/api/csv_result/${data.id}`
-            })
-        },
-
+                window.location.href = `/api/csv_result/${data.id}`;
+            });
+        }
     },
-
-    
 
     mounted() {
         this.fetchUserSummary();
+        this.fetchQuizAttempts();
     }
 };

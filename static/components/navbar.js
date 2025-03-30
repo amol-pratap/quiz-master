@@ -3,12 +3,13 @@ export default {
     template: `
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container-fluid">
-                <div class="col-10">
+                <div class="col-9">
                     <router-link v-if="role === 'admin'" class="navbar-brand" to="/admin_dashboard"> Quiz Master  </router-link>
                     <router-link v-if="role === 'admin'"  to="/admin_dashboard"> HOME </router-link>
 
                     <router-link v-if="role === 'user'" class="navbar-brand" to="/home"> Quiz Master   </router-link>
                      <router-link v-if="role === 'user'" to="/home"> HOME </router-link>  
+                     
 
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                         <span class="navbar-toggler-icon"></span>
@@ -22,6 +23,8 @@ export default {
 
                                 <router-link v-if="role === 'user'" class="nav-link" to="/u_summary">Summary</router-link>
                                 <router-link v-if="role === 'user'" class="nav-link" to="/u_search">Search</router-link>
+
+                                 <router-link v-if="role === 'user'" class="nav-link" to="/u_profile">Profile</router-link>
 
                                 <router-link v-if="!loggedIn" class="btn btn-primary" to="/login">Login </router-link>
                                 <router-link v-if="!loggedIn" class="btn btn-secondary" to="/sign_up">Sign Up</router-link>

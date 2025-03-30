@@ -11,7 +11,7 @@ class User(db.Model, UserMixin):
     fs_uniquifier = db.Column(db.String, unique = True, nullable = False)
     active = db.Column(db.Boolean, nullable = False)
     roles = db.relationship('Role', backref = 'bearer', secondary = 'users_roles')
-    # extra
+   
 
 class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer, primary_key = True)
@@ -70,7 +70,7 @@ class Option(db.Model):
 #score card details of evry attempt
 class Attemptscores(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # ✅ Corrected FK
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  
     quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'), nullable=False)
     score = db.Column(db.Integer, nullable=False)
     timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())

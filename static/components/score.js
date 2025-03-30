@@ -1,14 +1,14 @@
 export default {
     template: `
     <div class="container mt-4">
-        <h2 class="text-center">📊 Quiz Summary</h2>
+        <h2 class="text-center"> Quiz Summary</h2>
 
         <div v-if="quiz_title">
-            <p class="text-center text-muted">📘 Subject: <strong>{{ subject_name }}</strong> | 📖 Chapter: <strong>{{ chapter_name }}</strong></p>
+            <p class="text-center text-muted"> Subject: <strong>{{ subject_name }}</strong> |  Chapter: <strong>{{ chapter_name }}</strong></p>
             <h3 class="text-center text-primary fw-bold">{{ quiz_title }}</h3>
 
             <div v-if="attempts.length">
-                <h5 class="mt-4">📝 Your Attempts:</h5>
+                <h5 class="mt-4"> Your Attempts:</h5>
 
                 <div class="table-responsive">
                     <table class="table table-hover table-striped text-center">
@@ -16,14 +16,14 @@ export default {
                             <tr>
                                 <th>Attempt No.</th>
                                 <th>Total Qs</th>
-                                <th>✅ Correct</th>
-                                <th>❌ Incorrect</th>
-                                <th>⚠️ Unattempted</th>
-                                <th>📊 Total Marks</th>
-                                <th>🎯 Obtained</th>
+                                <th> Correct</th>
+                                <th> Incorrect</th>
+                                <th> Unattempted</th>
+                                <th> Total Marks</th>
+                                <th> Obtained</th>
                                 <th>% Score</th>
-                                <th>⏳ Time</th>
-                                <th>🔎 Details</th>
+                                <th> Time</th>
+                                <th> Details</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -47,7 +47,7 @@ export default {
                                     </td>
                                 </tr>
 
-                                <!-- Attempt Details Section -->
+                         
                                 <tr v-if="activeAttempt === i" :key="'details-' + attempt.attempt_id">
                                     <td colspan="10">
                                         <div class="accordion" id="attemptDetails">
@@ -57,7 +57,7 @@ export default {
                                                         data-bs-toggle="collapse" 
                                                         :data-bs-target="'#collapse' + attempt.attempt_id" 
                                                         aria-expanded="true">
-                                                        📜 View Attempt Details
+                                                         View Attempt Details
                                                     </button>
                                                 </h2>
                                                 <div :id="'collapse' + attempt.attempt_id" class="accordion-collapse collapse show">
@@ -65,15 +65,15 @@ export default {
                                                         <div v-if="responses[attempt.attempt_id] && responses[attempt.attempt_id].length">
                                                             <div v-for="(response, j) in responses[attempt.attempt_id]" :key="j" class="border rounded p-3 mb-3 shadow-sm">
                                                                 <p class="fw-bold">Q{{ j + 1 }}: {{ response.question_text }}</p>
-                                                                <p class="text-primary"><strong>✅ Correct Answer:</strong> {{ response.correct_option }}</p>
+                                                                <p class="text-primary"><strong> Correct Answer:</strong> {{ response.correct_option }}</p>
                                                                 <p :class="response.selected_option !== response.correct_option ? 'text-danger' : 'text-success'">
-                                                                    <strong>📝 Your Answer:</strong> 
+                                                                    <strong> Your Answer:</strong> 
                                                                     {{ response.selected_option ? response.selected_option : "Unattempted" }}
                                                                 </p>
                                                             </div>
                                                         </div>
                                                         <div v-else>
-                                                            <p class="text-muted">⏳ Loading attempt details...</p>
+                                                            <p class="text-muted"> Loading attempt details...</p>
                                                         </div>
                                                     </div>
                                                 </div>

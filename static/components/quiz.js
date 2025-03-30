@@ -5,7 +5,7 @@ export default {
         <h2 class="text-center my-3">Chapter: {{chapter_title}}</h2>
 
         <div class="row">
-            <!-- Quiz List -->
+         
             <div v-for="quiz in quizzes" :key="quiz.id" class="col-md-4 mb-3">
                 <div class="card shadow-sm">
                     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
@@ -19,14 +19,14 @@ export default {
                     <div class="card-body">
                         <p>{{ quiz.description }}</p>
 
-                        <!-- Headers for Question Section -->
+                     
                         <h6 class="text-muted mb-2">Questions:</h6>
                         <div class="row fw-bold mb-2">
                             <div class="col-8">Question</div>
                             <div class="col-4">Action</div>
                         </div>
 
-                        <!-- Question List with Actions -->
+            
                         <div v-for="question in quiz.questions" :key="question.id" class="row align-items-center mb-2">
                             <div class="col-8">{{ question.text }}</div>
                             <div class="col-4">
@@ -44,7 +44,7 @@ export default {
                 </div>
             </div>
 
-            <!-- Add New Quiz Card -->
+     
             <div class="row justify-content-center">
             <div class="col-md-4 mb-3 mx-auto text-center">
                 <div class="card border-primary shadow-sm">

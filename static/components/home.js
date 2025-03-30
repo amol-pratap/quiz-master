@@ -3,7 +3,7 @@ export default {
         <div class="container">
             
             <h2> welcome {{userData.username}}  </h2>
-            <h4 class="text-center bg-success text-white"> Choose any subject to give quiz </h4>
+            <h4 class="text-center bg-success text-white"> Choose a chapter of any subject to give quiz </h4>
             <div class='mb-3'>
                 
                 <div class="row">
@@ -17,14 +17,14 @@ export default {
                     <div class="card-body">
                         <p>{{ subject.description }}</p>
 
-                        <!-- Headers for Chapter Section -->
+                    
                         <h6 class="text-muted mb-2">Chapters:</h6>
                         <div class="row fw-bold mb-2">
                             <div class="col-5">Chapter Name</div>
                             <div class="col-3">Quizzes</div>
                         </div>
 
-                        <!-- Chapter List with Quiz Count & Actions -->
+                
                         <div v-for="chapter in subject.chapters" :key="chapter.id" class="row align-items-center mb-2">
                             <router-link :to="'/u_quiz/' + chapter.id" class="col-5">{{ chapter.title }}</router-link>
 

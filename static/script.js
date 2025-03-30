@@ -20,6 +20,7 @@ import edit_question from './components/edit_question.js'
 import u_search from './components/u_search.js';
 import a_search from './components/a_search.js';
 import u_summary from './components/u_summary.js';
+import u_profile from './components/u_profile.js';
 import a_summary from './components/a_summary.js';
 
 
@@ -50,6 +51,7 @@ const routes = [
 
     { path: '/u_search', component: u_search },
     { path: '/u_summary', component: u_summary },
+    { path: '/u_profile', component: u_profile },
     { path: '/a_search', component: a_search },
     { path: '/a_summary', component: a_summary },
 ]

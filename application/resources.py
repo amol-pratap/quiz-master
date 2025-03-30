@@ -7,11 +7,7 @@ from .utils import roles_list
 
 api = Api()
 
-# def roles_list(roles):
-#     role_list = []
-#     for role in roles:
-#         role_list.append(role.name)
-#     return role_list
+
 
 
 class SubjectResource(Resource):
@@ -132,7 +128,6 @@ class ChapterResource(Resource):
 
 class QuizResource(Resource):
     @auth_required('token')
-    # @roles_required('admin')
     @roles_accepted('user','admin')
     def get(self, quiz_id):
         quiz = Quiz.query.get(quiz_id)
@@ -162,8 +157,6 @@ class QuizResource(Resource):
         if not quiz:
             return {"error": "Quiz not found"}, 404
         
-        #Delete its related question
-        # Question.query.filter_by(quiz_idid=quiz_id).delete()
         db.session.delete(quiz)
         db.session.commit()
         return {"message": "Quiz deleted successfully"}, 200
@@ -193,7 +186,7 @@ class QuestionResource(Resource):
             return {"error": "Question not found"}, 404
 
         body = request.get_json()
-        print("To upade-------------------- ",body)
+  
         
         question.q_text = body["text"]
         question.correct_option_id = body["correct_option_id"]
@@ -216,10 +209,10 @@ class QuestionResource(Resource):
         if not question:
             return {"error": "Question not found"}, 404
 
-        # Delete related options first (to maintain referential integrity)
+
         Option.query.filter_by(question_id=question.id).delete()
 
-        # Delete the question itself
+
         db.session.delete(question)
         db.session.commit()
 

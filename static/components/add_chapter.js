@@ -47,12 +47,12 @@ export default {
             })
             .then(response => response.json())
             .then(() => {
-                alert("✅ Chapter added successfully!");
+                alert(" Chapter added successfully!");
                 this.$router.go(-1);  
             })
             .catch(error => {
                 console.error("Error adding chapter:", error);
-                alert("❌ Error adding chapter!");
+                alert("Error adding chapter!");
             });
         }
     },

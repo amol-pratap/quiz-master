@@ -19,7 +19,7 @@ export default {
                     <div class="card-body">
                         <p>{{ subject.description }}</p>
 
-                        <!-- Headers for Chapter Section -->
+                       
                         <h6 class="text-muted mb-2">Chapters:</h6>
                         <div class="row fw-bold mb-2">
                             <div class="col-5">Chapter Name</div>
@@ -27,7 +27,7 @@ export default {
                             <div class="col-4">Action</div>
                         </div>
 
-                        <!-- Chapter List with Quiz Count & Actions -->
+                       
                         <div v-for="chapter in subject.chapters" :key="chapter.id" class="row align-items-center mb-2">
                             <router-link :to="'/quiz/' + chapter.id" class="col-5">{{ chapter.title }}</router-link>
 
@@ -51,7 +51,7 @@ export default {
 
             
 
-            <!-- Add New Subject Card -->
+         
                 <div class="row justify-content-center">
             <div class="col-md-4 mb-3 text-center">
                 <div class="card border-primary shadow-sm">

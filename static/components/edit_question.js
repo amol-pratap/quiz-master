@@ -3,13 +3,12 @@ export default {
         <div class="container">
             <h2 class="text-center">Edit Question</h2>
             <form @submit.prevent="updateQuestion">
-                <!-- Question Text -->
+             
                 <div class="mb-3">
                     <label class="form-label">Question Text</label>
                     <textarea class="form-control" v-model="question.text" required></textarea>
                 </div>
 
-                <!-- Options (Fixed 4) with Radio Buttons -->
                 <div class="mb-3">
                     <label class="form-label">Options</label>
                     <div v-for="(option, index) in question.options" :key="index" class="input-group mb-2">
@@ -20,7 +19,7 @@ export default {
                     </div>
                 </div>
 
-                <!-- Submit Button -->
+   
                 <button type="submit" class="btn btn-success">Update Question</button>
             </form>
         </div>

@@ -6,13 +6,13 @@ export default {
         <div class="card shadow-sm p-4">
             <div v-if="message" class="alert alert-info text-center">{{ message }}</div>
 
-            <!-- Question Input -->
+      
             <div class="mb-3">
                 <label for="question_text" class="form-label">Question</label>
                 <textarea id="question_text" v-model="question.text" class="form-control bg-primary text-white bg-gradient p-3" rows="3" placeholder="Enter your question here" required></textarea>
             </div>
 
-            <!-- Options -->
+         
             <div class="mb-3">
                 <label class="form-label">Options</label>
                 <div v-for="(option, index) in question.options" :key="index" class="input-group mb-2">
@@ -24,7 +24,7 @@ export default {
                 </div>
             </div>
 
-            <!-- Submit Button -->
+     
             <button @click="submitQuestion" class="btn btn-primary w-100">Submit Question</button>
         </div>
     </div>`,

@@ -1,15 +1,15 @@
 from .database import db 
 from .models import *
 from flask import current_app as app, jsonify, request,render_template,  send_from_directory
-# from flask_security import hash_password, auth_required, roles_required, current_user
 from flask_security import auth_required, roles_required, roles_accepted, current_user, login_user
 from werkzeug.security import check_password_hash, generate_password_hash
 from .utils import roles_list
 
 from celery.result import AsyncResult
-from .tasks import csv_report, monthly_report  #, delivery_report
-# from .tasks import *
-from sqlalchemy.sql import text
+from .tasks import csv_report, monthly_report, new_quiz_update
+
+from sqlalchemy import text
+
 
 from flask_security.utils import verify_password
 from datetime import datetime
@@ -23,7 +23,7 @@ def index():
 @auth_required('token') #Authorizarion
 @roles_required('admin') #RBAC/ Authorization
 def admin_home():
-    print("WOrking---------------------",)
+   
     subjects_data = []  # List to store subject details
     subjects = Subject.query.all()
     
@@ -36,7 +36,7 @@ def admin_home():
         
     chapters_data = []  # List to store subject details
     chapters = Chapter.query.all()  
-    print("WOrking chapters---------------------",chapters)
+   
     for chap in chapters:
        chapters_data.append({
             'id': chap.id,
@@ -60,10 +60,8 @@ def user_home():
     
 #To login user and admin
 @app.route('/api/login', methods=['POST'])
-# @app.route('/login', methods=['POST'])
 def user_login():
-    # print("Headers:", request.headers)
-    print("JSON Body:", request.get_json())
+   
     body = request.get_json()
     email = body['email']
     password = body['password']
@@ -80,14 +78,10 @@ def user_login():
             
             for role in user.roles:
                 role_n = role.name
-                print(role_n)
-                
-            # if current_user is not None:
-            #     return jsonify({
-            #     "message": "Already logged in!"
-            # }), 400
+              
+         
             login_user(user)
-            print(current_user, user.roles)
+          
             roles = roles_list(user.roles)
             role = 'admin' if 'admin' in roles else 'user'
             return jsonify({
@@ -98,12 +92,12 @@ def user_login():
                 "auth-token": user.get_auth_token()
             })
         else:
-            print("not ___Sucess login, password is incorrect______________________________")
+          
             return jsonify({
                 "message": "Incorrect Password"
             }), 400
     else:
-       print("not Sucess login, user not found______________________________")
+       
        return jsonify({
             "message": "User Not Found!"
         }), 404 
@@ -139,7 +133,7 @@ def create_user():
 # @roles_accepted(['user', 'admin']) #OR
 def user_dashboard():
     user = current_user
-    print("CUrrent user--",user)
+   
     return jsonify({
         "id": current_user.id,
         "username": user.username,
@@ -149,37 +143,22 @@ def user_dashboard():
     })
     
     
-    
+
 #To create new subject
-# @app.route('/api/subject', methods=['POST'])
-# @auth_required('token')
-# @roles_required('admin')
-# def create_subject():
-#     body = request.get_json()
-    
-#     new_subject = Subject(name = body['name'],
-#                 description = body['description'])
-#     db.session.add(new_subject)
-#     db.session.commit()
-
-#     return jsonify({
-#         "message": "Subject created Successfully!"
-#     }),201
-
 @app.route('/api/subject', methods=['POST'])
 @auth_required('token')
 @roles_required('admin')
 def add_subject():
     data = request.get_json()
-    subject_name = data.get("name").strip()  # ✅ Trim spaces
+    subject_name = data.get("name").strip() 
     subject_desc = data.get("description").strip()
 
-    # ✅ Check if subject already exists
+    #  Check if subject already exists
     existing_subject = Subject.query.filter_by(name=subject_name).first()
     if existing_subject:
-        return jsonify({"error": "Subject already exists!"}), 400  # ✅ Return 400 Bad Request
+        return jsonify({"error": "Subject already exists!"}), 400  
 
-    # ✅ Create new subject
+    #  Create new subject
     new_subject = Subject(name=subject_name, description=subject_desc)
     db.session.add(new_subject)
     db.session.commit()
@@ -212,7 +191,7 @@ def create_chapter():
 # @roles_required('admin')
 def get_subjects_with_chapters():
     subjects = Subject.query.all()
-    print("fetched--",current_user)
+   
     data = []
     for subject in subjects:
         chapters = Chapter.query.filter_by(subject_id=subject.id).all()
@@ -225,7 +204,7 @@ def get_subjects_with_chapters():
                 {
                     'id': chapter.id,
                     'title': chapter.title,
-                    'quiz_count': Quiz.query.filter_by(chapter_id=chapter.id).count()  # ✅ Quiz count logic
+                    'quiz_count': Quiz.query.filter_by(chapter_id=chapter.id).count()  
                 } for chapter in chapters
             ]
         })
@@ -319,6 +298,12 @@ def add_quiz():
         # Set the correct answer
         new_question.correct_option_id = options[question_data['correct_answer']].id
         db.session.commit() 
+        
+    quiz_name = new_quiz.title
+    chapter_name =  Chapter.query.filter_by(id=chapter_id).first().title
+    subject_name =  Subject.query.filter_by(id=subject_id).first().name
+    result = new_quiz_update.delay(quiz_name, chapter_name, subject_name )
+        
             
     return jsonify({"message": "Quiz created successfully!"}), 201
 
@@ -357,34 +342,6 @@ def add_question(quiz_id):
 
     return jsonify({"success": True, "message": "Question added successfully"}), 201
 
-
-# ADmin Search
-# @app.route('/api/admin_search', methods=['GET'])
-# @auth_required('token')
-# @roles_required('admin')
-# def admin_search():
-#     search_type = request.args.get("searchType")
-#     query = request.args.get("query", "").strip()
-
-#     if not query:
-#         return jsonify({"error": "Search query required"}), 400
-
-#     if search_type == "user":
-#         results = User.query.filter(User.username.ilike(f"%{query}%")).all()
-#         response = [{"id": u.id, "username": u.username, "email": u.email, "role": u.roles[0].name if u.roles else "N/A"} for u in results]
-
-#     elif search_type == "subject":
-#         results = Subject.query.filter(Subject.name.ilike(f"%{query}%")).all()
-#         response = [{"id": s.id, "name": s.name, "description": s.description} for s in results]
-
-#     elif search_type == "chapter":
-#         results = Chapter.query.filter(Chapter.title.ilike(f"%{query}%")).all()
-#         response = [{"id": c.id, "title": c.title, "subject_id": c.subject_id} for c in results]
-
-#     else:
-#         return jsonify({"error": "Invalid search type"}), 400
-
-#     return jsonify({"results": response}), 200
 
 
 @app.route('/api/admin_search', methods=['GET'])
@@ -470,42 +427,6 @@ def admin_search():
 
 
 
-# @app.route('/api/admin_summary', methods=['GET'])
-# @auth_required('token')
-# @roles_required('admin')
-# def admin_summary():
-#     summary_query = """
-#         SELECT 
-#             (SELECT COUNT(*) FROM user) AS total_users,
-#             (SELECT COUNT(*) FROM subject) AS total_subjects,
-#             (SELECT COUNT(*) FROM chapter) AS total_chapters,
-#             (SELECT COUNT(*) FROM quiz) AS total_quizzes,
-#             (SELECT COUNT(*) FROM attemptscores) AS total_attempts,
-#             (SELECT COUNT(DISTINCT user_id) FROM attemptscores) AS unique_users_attempted
-#     """
-    
-#     result = db.session.execute(text(summary_query)).fetchone()
-    
-#     if result:
-#         response = {
-#             "total_users": result.total_users -1,
-#             "total_subjects": result.total_subjects,
-#             "total_chapters": result.total_chapters,
-#             "total_quizzes": result.total_quizzes,
-#             "total_attempts": result.total_attempts,
-#             "unique_users_attempted": result.unique_users_attempted
-#         }
-#     else:
-#         response = {
-#             "total_users": 0,
-#             "total_subjects": 0,
-#             "total_chapters": 0,
-#             "total_quizzes": 0,
-#             "total_attempts": 0,
-#             "unique_users_attempted": 0
-#         }
-
-#     return jsonify(response), 200
 
 @app.route('/api/admin_summary', methods=['GET'])
 @auth_required('token')
@@ -572,6 +493,29 @@ def admin_summary():
     return jsonify(response), 200
 
 
+@app.route('/api/delete_user/<int:user_id>', methods=['DELETE'])
+@auth_required('token')
+@roles_required('admin')
+def delete_user(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    db.session.delete(user)
+    db.session.commit()
+
+    return jsonify({'message': 'User deleted successfully'}), 200
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -618,7 +562,7 @@ def get_quiz(quiz_id):
 def submit_quiz(quiz_id):
     data = request.get_json()
     user_answers = data.get('answers', {})  
-    time_taken = data.get('time_taken', 0)  # ✅ Fetch time taken from frontend
+    time_taken = data.get('time_taken', 0)  #  Fetch time taken from frontend
 
     user_id = current_user.id
     quiz = Quiz.query.get(quiz_id)
@@ -634,7 +578,7 @@ def submit_quiz(quiz_id):
     incorrect_count = 0
     unattempted_count = 0
 
-    # ✅ Save new attempt with time_taken
+    #  Save new attempt with time_taken
     new_attempt = Attemptscores(user_id=user_id, quiz_id=quiz_id, score=0, time_taken=time_taken)
     db.session.add(new_attempt)
     db.session.flush()  
@@ -672,7 +616,7 @@ def submit_quiz(quiz_id):
         "total_marks": total_questions * 4,
         "obtained_marks": obtained_marks,
         "percentage": round((obtained_marks / (total_questions * 4)) * 100, 2),
-        "time_taken": time_taken  # ✅ Return time taken
+        "time_taken": time_taken  #  Return time taken
     }), 200
 
 
@@ -716,7 +660,6 @@ def quiz_summary(quiz_id):
 
         attempt_data.append({
             "attempt_id": attempt.id,
-            # "timestamp": attempt.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
             "time_taken": formatted_time,
             "total_questions": total_questions,
             "correct": correct,
@@ -749,7 +692,7 @@ def get_attempt_responses(attempt_id):
     responses = AttemptResponse.query.filter_by(attempt_id=attempt_id).all()
     
     if not responses:
-        return jsonify({"error": "No responses found for this attempt"}), 404  # ✅ Handle missing responses
+        return jsonify({"error": "No responses found for this attempt"}), 404  
     
     response_data = []
     for response in responses:
@@ -824,8 +767,8 @@ def search_quiz():
 
 
 
-
-@app.route('/api/user_summary', methods=['GET'])     # Summary of all quiz given by a user
+# Summary of all quiz given by a user
+@app.route('/api/user_summary', methods=['GET'])  
 @auth_required('token')
 @roles_required('user')
 def user_summary():
@@ -877,7 +820,7 @@ def user_summary():
 def export_csv(quiz_id):
     user_id = current_user.id
     result = csv_report.delay(quiz_id, user_id) # async object
-    print("REady-----------------------------------------------------",result.id,"-----", result.result)
+
     return jsonify({
         "id": result.id,
         "result": result.result,
@@ -888,7 +831,88 @@ def export_csv(quiz_id):
 @app.route('/api/csv_result/<id>') # just create to test the status of result
 def csv_result(id):
     res = AsyncResult(id)
-    print("csV+result _________________________ready-------------------------------------------------------------------------------------------------------",res,"-------",res.result)
+
     if res:  
         return send_from_directory('static', res.result)
     return jsonify({"message": "result not found"}), 404
+
+
+
+@app.route('/api/user/quiz_attempts', methods=['GET'])
+@auth_required('token')
+def get_user_quiz_attempts():
+    user_id = current_user.id  # Get logged-in user ID
+
+    query = """
+        SELECT s.name AS subject_name, COUNT(DISTINCT a.quiz_id) AS attempts
+        FROM attemptscores a
+        JOIN quiz q ON a.quiz_id = q.id
+        JOIN chapter c ON q.chapter_id = c.id
+        JOIN subject s ON c.subject_id = s.id
+        WHERE a.user_id = :user_id
+        GROUP BY s.name
+        ORDER BY attempts DESC
+    """
+
+    result = db.session.execute(text(query), {"user_id": user_id}).fetchall()
+    response = [{"subject": row.subject_name, "attempts": row.attempts} for row in result]
+
+    return jsonify(response), 200
+
+
+
+
+
+
+# @app.route('/api/user_profile', methods=['GET'])
+# @auth_required('token')
+# def user_profile():
+#     try:
+#         print(f"Fetching profile for user: {current_user.id}")  # Debugging
+
+#         query = text("""
+#             SELECT q.id AS quiz_id, s.subject_name, c.chapter_title, q.quiz_title,
+#                    COUNT(a.id) AS total_attempts,
+#                    COALESCE(MAX(a.score), 0) AS best_score,
+#                    COALESCE(AVG(a.score), 0) AS average_score,
+#                    q.total_questions
+#             FROM quiz q
+#             JOIN chapter c ON q.chapter_id = c.id
+#             JOIN subject s ON c.subject_id = s.id
+#             LEFT JOIN attemptscores a ON q.id = a.quiz_id AND a.user_id = :user_id
+#             GROUP BY q.id, s.subject_name, c.chapter_title, q.title, q.total_questions
+#         """)
+
+#         quiz_summary = db.session.execute(query, {"user_id": current_user.id}).mappings().all()
+
+#         print("✅ Query executed successfully")  # Debugging
+
+#         return jsonify({
+#             "name": current_user.name,
+#             "email": current_user.email,
+#             "qualification": current_user.qualification,
+#             "quiz_summary": [dict(row) for row in quiz_summary]
+#         })
+
+#     except Exception as e:
+#         print("❌ ERROR in user_profile:", str(e))  # Print full error
+#         return jsonify({"error": "Internal Server Error", "details": str(e)}), 500
+
+
+@app.route('/api/user_profile', methods=['GET'])
+@auth_required('token')
+@roles_required('user')
+def get_user_profile():
+    """Fetch logged-in user's profile details"""
+    user = current_user
+    
+    
+    
+    return jsonify({
+        "id": user.id,
+        "email": user.email,
+        "username": user.username,
+        "qualification": user.qulification,
+        "active": user.active
+    
+    })

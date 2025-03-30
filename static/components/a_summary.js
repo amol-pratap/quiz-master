@@ -1,10 +1,10 @@
 export default {
     template: `
     <div class="container mt-4">
-        <h2 class="text-center text-primary">📊 Admin Summary</h2>
+        <h2 class="text-center text-primary"> Admin Summary</h2>
 
         <div v-if="summary">
-            <!-- Summary Cards -->
+
             <div class="row mt-4">
                 <div class="col-md-4 mb-3" v-for="(value, key) in generalSummary" :key="key">
                     <div class="card shadow-sm">
@@ -16,19 +16,19 @@ export default {
                 </div>
             </div>
 
-            <!-- Quiz Performance Table -->
-            <h3 class="mt-5 text-center text-secondary">📚 Quiz Performance Summary</h3>
+           
+            <h3 class="mt-5 text-center text-secondary"> Quiz Performance Summary</h3>
             <div class="table-responsive mt-3">
                 <table class="table table-striped text-center">
                     <thead class="table-dark">
                         <tr>
-                            <th>📖 Subject</th>
-                            <th>📚 Chapter</th>
-                            <th>📝 Quiz</th>
-                            <th>🔄 Total Attempts</th>
-                            <th>👥 Unique Users</th>
-                            <th>🏆 Best Score</th>
-                            <th>📊 Average Score</th>
+                            <th> Subject</th>
+                            <th> Chapter</th>
+                            <th> Quiz</th>
+                            <th> Total Attempts</th>
+                            <th> Unique Users</th>
+                            <th> Best Score</th>
+                            <th> Average Score</th>
                         </tr>
                     </thead>
                     <tbody>
